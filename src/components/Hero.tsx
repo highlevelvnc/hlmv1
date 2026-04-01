@@ -81,7 +81,7 @@ export default function Hero() {
       ref={sectionRef}
       aria-label="HLM — Intelligent revenue systems"
       className="relative bg-white"
-      style={{ height: "220vh" }}
+      style={{ height: "230vh" }}
     >
       {/* Sticky viewport container — stays on screen while scrolling through the section */}
       <div

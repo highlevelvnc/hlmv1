@@ -5,6 +5,7 @@ import SectionDivider from "@/components/SectionDivider";
 import ValueProp from "@/components/ValueProp";
 import Services from "@/components/Services";
 import Differentiation from "@/components/Differentiation";
+import BrainOrb from "@/components/BrainOrb";
 import Proof from "@/components/Proof";
 import CTA from "@/components/CTA";
 import SignalPath from "@/components/SignalPath";
@@ -54,6 +55,7 @@ export default function Home() {
         <Services />
         <SectionDivider />
         <Differentiation />
+        <BrainOrb />
         <div id="s-proof"><Proof /></div>
         <div id="s-cta"><CTA /></div>
       </main>

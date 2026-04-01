@@ -7,68 +7,30 @@ export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [progress, setProgress] = useState(0);
 
+  // Autoplay once — no loop, last frame freezes naturally on ended
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
 
-    if (prefersReduced) {
-      video.play().catch(() => {});
-      return;
-    }
+    video.play().catch(() => {});
+  }, []);
 
-    // iOS unlock: play then immediately pause so currentTime seeking is unblocked
-    const unlock = () => {
-      video.play().then(() => {
-        video.pause();
-        video.currentTime = 0;
-      }).catch(() => {});
-    };
-
-    if (video.readyState >= 1) {
-      unlock();
-    } else {
-      video.addEventListener("loadedmetadata", unlock, { once: true });
-    }
-
-    // Lerp-based smooth seeking — scroll sets target, RAF eases toward it
-    let currentTime = 0;
-    let targetTime = 0;
-    let rafId: number;
-
-    const animate = () => {
-      if (video.duration) {
-        currentTime += (targetTime - currentTime) * 0.08;
-
-        if (Math.abs(currentTime - targetTime) > 0.005) {
-          try {
-            video.currentTime = currentTime;
-          } catch {
-            // ignore
-          }
-        }
-      }
-      rafId = requestAnimationFrame(animate);
-    };
-
+  // Scroll progress — drives tagline fade and scroll indicator only (not the video)
+  useEffect(() => {
     const handleScroll = () => {
-      if (!sectionRef.current || !video.duration) return;
+      if (!sectionRef.current) return;
       const rect = sectionRef.current.getBoundingClientRect();
       const sectionHeight = sectionRef.current.offsetHeight - window.innerHeight;
       const scrolled = -rect.top;
       const p = Math.max(0, Math.min(1, scrolled / sectionHeight));
       setProgress(p);
-      targetTime = p * video.duration;
     };
 
-    rafId = requestAnimationFrame(animate);
     window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Fade out hero content — gone at 50% progress
@@ -105,32 +67,32 @@ export default function Hero() {
           <LanguageSwitcher />
         </div>
 
-        {/* Decorative video layer — stays on last frame as section scrolls away */}
+        {/* Video — plays once, freezes on last frame */}
         <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
           <video
             ref={videoRef}
             muted
             playsInline
-            preload="metadata"
+            preload="auto"
             className="h-full w-full object-cover"
             style={{
-              filter: "saturate(0.8) contrast(0.92) brightness(1.0) blur(0.3px)",
+              filter: "saturate(0.9) contrast(0.97) brightness(1.0)",
             }}
           >
             <source src="/FunnelSequence.mp4" type="video/mp4" />
           </video>
         </div>
 
-        {/* White overlay — light veil to integrate with page */}
-        <div className="absolute inset-0 bg-white/[0.18]" aria-hidden="true" />
+        {/* White overlay — reduced to let video breathe */}
+        <div className="absolute inset-0 bg-white/[0.08]" aria-hidden="true" />
 
-        {/* Inward masking gradient — center breathes, edges dissolve to white */}
+        {/* Inward masking gradient — center open, edges dissolve to white */}
         <div
           className="absolute inset-0"
           aria-hidden="true"
           style={{
             background:
-              "radial-gradient(ellipse 68% 62% at 50% 50%, transparent 0%, rgba(255,255,255,0.12) 38%, rgba(255,255,255,0.60) 65%, white 88%)",
+              "radial-gradient(ellipse 75% 68% at 50% 50%, transparent 0%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0.50) 68%, white 90%)",
           }}
         />
 

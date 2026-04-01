@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import FadeIn from "./FadeIn";
+import Orb from "./Orb";
 
 interface FormState  { name: string; email: string; message: string }
 interface FormErrors { name?: string; email?: string; message?: string }
@@ -113,6 +114,9 @@ export default function CTA() {
 
       {/* ── Main area ── */}
       <div className="relative flex min-h-screen flex-col items-center justify-center py-40">
+        {/* Interactive orb — behind all content */}
+        <Orb />
+
         <div className="relative flex w-full flex-col items-center text-center">
 
           <FadeIn>

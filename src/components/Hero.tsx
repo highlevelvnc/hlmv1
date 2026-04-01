@@ -80,15 +80,15 @@ export default function Hero() {
             preload="auto"
             className="h-full w-full object-cover"
             style={{
-              filter: "saturate(0.9) contrast(0.97) brightness(1.0)",
+              filter: "saturate(0.95) contrast(1.02) brightness(1.0)",
             }}
           >
             <source src="/FunnelSequence.mp4" type="video/mp4" />
           </video>
         </div>
 
-        {/* White overlay — reduced to let video breathe */}
-        <div className="absolute inset-0 bg-white/[0.08]" aria-hidden="true" />
+        {/* White overlay — minimal, only to anchor page integration */}
+        <div className="absolute inset-0 bg-white/[0.05]" aria-hidden="true" />
 
         {/* Inward masking gradient — center open, edges dissolve to white */}
         <div
@@ -96,7 +96,7 @@ export default function Hero() {
           aria-hidden="true"
           style={{
             background:
-              "radial-gradient(ellipse 75% 68% at 50% 50%, transparent 0%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0.50) 68%, white 90%)",
+              "radial-gradient(ellipse 80% 74% at 50% 50%, transparent 0%, rgba(255,255,255,0.22) 78%, white 94%)",
           }}
         />
 

@@ -153,15 +153,15 @@ export default function ScrollSequence() {
             preload="metadata"
             className="h-full w-full object-cover"
             style={{
-              filter: "saturate(0.8) contrast(0.92) brightness(1.0) blur(0.3px)",
+              filter: "saturate(0.92) contrast(1.0) brightness(1.0)",
             }}
           >
             <source src="/anima2.mp4" type="video/mp4" />
           </video>
         </div>
 
-        {/* White overlay */}
-        <div className="absolute inset-0 bg-white/[0.22]" aria-hidden="true" />
+        {/* White overlay — kept light to let video depth show */}
+        <div className="absolute inset-0 bg-white/[0.07]" aria-hidden="true" />
 
         {/* Inward masking gradient */}
         <div
@@ -169,7 +169,7 @@ export default function ScrollSequence() {
           aria-hidden="true"
           style={{
             background:
-              "radial-gradient(ellipse 68% 62% at 50% 50%, transparent 0%, rgba(255,255,255,0.12) 38%, rgba(255,255,255,0.60) 65%, white 88%)",
+              "radial-gradient(ellipse 74% 68% at 50% 50%, transparent 0%, rgba(255,255,255,0.20) 72%, white 91%)",
           }}
         />
 

@@ -103,8 +103,7 @@ export default function ScrollSequence() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Video fades in during the first 15% of scroll
-  const videoOpacity = Math.min(1, progress / 0.10);
+  // Video always visible — no fade-in to avoid white gap on transition from hero
 
   const getStageOpacity = (index: number) => {
     const stageStart = 0.1 + index * 0.28;
@@ -140,10 +139,9 @@ export default function ScrollSequence() {
         className="sticky top-0 flex w-full items-center justify-center overflow-hidden"
         style={{ height: "100svh", minHeight: "100vh" }}
       >
-        {/* Decorative video layer — fades in on scroll */}
+        {/* Decorative video layer */}
         <div
-          className="absolute inset-0 transition-opacity duration-700"
-          style={{ opacity: videoOpacity }}
+          className="absolute inset-0"
           aria-hidden="true"
         >
           <video

@@ -40,6 +40,19 @@ export default function Services() {
       <div className="h-20 bg-gradient-to-b from-white to-neutral-50/60" />
 
       <div className="relative bg-neutral-50/60 px-6 py-28 sm:py-40">
+        {/* Ambient light drift — slow-moving, nearly invisible */}
+        <div
+          className="pointer-events-none absolute left-1/3 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          aria-hidden="true"
+          style={{
+            width: "900px",
+            height: "600px",
+            background:
+              "radial-gradient(ellipse at center, rgba(0,0,0,0.018) 0%, transparent 60%)",
+            animation: "drift 28s ease-in-out infinite",
+          }}
+        />
+
         {/* Decorative dot row — top right */}
         <div className="pointer-events-none absolute right-10 top-20 opacity-[0.05]" aria-hidden="true">
           <div className="flex gap-2.5">

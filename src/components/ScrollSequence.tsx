@@ -63,8 +63,8 @@ export default function ScrollSequence() {
 
     const targetTime = progress * video.duration;
     try {
-      // @ts-expect-error fastSeek is not in TS types but available in Firefox
-      if (typeof video.fastSeek === "function") video.fastSeek(targetTime);
+      const media = video as HTMLVideoElement & { fastSeek?: (time: number) => void };
+      if (typeof media.fastSeek === "function") media.fastSeek(targetTime);
       else video.currentTime = targetTime;
     } catch {
       // ignore seeking errors

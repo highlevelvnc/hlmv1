@@ -32,8 +32,8 @@ export default function Hero() {
 
     const seekTo = (t: number) => {
       try {
-        // @ts-expect-error fastSeek is not in TS types but available in Firefox
-        if (typeof video.fastSeek === "function") video.fastSeek(t);
+        const media = video as HTMLVideoElement & { fastSeek?: (time: number) => void };
+        if (typeof media.fastSeek === "function") media.fastSeek(t);
         else video.currentTime = t;
       } catch {
         // ignore — may fire before metadata is ready

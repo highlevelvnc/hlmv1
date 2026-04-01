@@ -28,14 +28,14 @@ export default function ValueProp() {
 
         <FadeIn delay={320}>
           <div className="mt-20 grid grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-x-20 max-w-4xl">
-            <div className="pl-6 border-l border-neutral-150">
+            <div className="pl-6 border-l border-neutral-200">
               <p className="text-[15px] font-light leading-[1.9] text-neutral-500">
                 Most agencies optimize for activity — impressions, clicks, followers.
                 HLM is built differently. Every system we deploy is designed to compound:
                 traffic becomes leads, leads become pipeline, pipeline becomes revenue.
               </p>
             </div>
-            <div className="pl-6 border-l border-neutral-150">
+            <div className="pl-6 border-l border-neutral-200">
               <p className="text-[15px] font-light leading-[1.9] text-neutral-500">
                 We combine paid distribution, intelligent automation, and AI-driven
                 personalization into a single, unified engine. Built once.

@@ -71,8 +71,8 @@ export default function Hero() {
     };
   }, []);
 
-  // Fade out hero content as the user scrolls deeper
-  const contentOpacity = Math.max(0, 1 - progress * 2.5);
+  // Fade out hero content — gone at 50% progress
+  const contentOpacity = Math.max(0, 1 - progress * 2);
   // Slight parallax shift on content
   const contentTranslateY = progress * 60;
 
@@ -81,7 +81,7 @@ export default function Hero() {
       ref={sectionRef}
       aria-label="HLM — Intelligent revenue systems"
       className="relative bg-white"
-      style={{ height: "250vh" }}
+      style={{ height: "220vh" }}
     >
       {/* Sticky viewport container — stays on screen while scrolling through the section */}
       <div
@@ -105,7 +105,7 @@ export default function Hero() {
           <LanguageSwitcher />
         </div>
 
-        {/* Decorative video layer */}
+        {/* Decorative video layer — stays on last frame as section scrolls away */}
         <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
           <video
             ref={videoRef}

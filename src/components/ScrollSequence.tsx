@@ -61,7 +61,7 @@ export default function ScrollSequence() {
 
     const animate = () => {
       if (video.duration && targetTimeRef.current >= 0) {
-        currentTime += (targetTimeRef.current - currentTime) * 0.07;
+        currentTime += (targetTimeRef.current - currentTime) * 0.08;
 
         if (Math.abs(currentTime - targetTimeRef.current) > 0.005) {
           try {
@@ -104,7 +104,7 @@ export default function ScrollSequence() {
   }, []);
 
   // Video fades in during the first 15% of scroll
-  const videoOpacity = Math.min(1, progress / 0.15);
+  const videoOpacity = Math.min(1, progress / 0.10);
 
   const getStageOpacity = (index: number) => {
     const stageStart = 0.1 + index * 0.28;

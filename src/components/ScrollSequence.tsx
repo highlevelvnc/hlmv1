@@ -61,7 +61,7 @@ export default function ScrollSequence() {
 
     const animate = () => {
       if (video.duration && targetTimeRef.current >= 0) {
-        currentTime += (targetTimeRef.current - currentTime) * 0.08;
+        currentTime += (targetTimeRef.current - currentTime) * 0.06;
 
         if (Math.abs(currentTime - targetTimeRef.current) > 0.005) {
           try {
@@ -133,7 +133,7 @@ export default function ScrollSequence() {
       ref={sectionRef}
       aria-label="How the revenue system works"
       className="relative bg-white"
-      style={{ height: "350vh" }}
+      style={{ height: "450vh" }}
     >
       {/* Sticky viewport container */}
       <div

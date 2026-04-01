@@ -9,6 +9,7 @@ import BrainOrb from "@/components/BrainOrb";
 import Proof from "@/components/Proof";
 import CTA from "@/components/CTA";
 import SignalPath from "@/components/SignalPath";
+import FloatingOrb from "@/components/FloatingOrb";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -43,6 +44,8 @@ export default function Home() {
       />
       {/* Header — fixed, revealed on scroll */}
       <Header />
+      {/* Floating orb — scroll companion */}
+      <FloatingOrb />
 
       {/* position: relative creates the stacking context SignalPath needs */}
       <main className="relative">

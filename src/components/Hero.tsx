@@ -7,7 +7,7 @@ export default function Hero() {
   const videoRef   = useRef<HTMLVideoElement>(null);
   const [progress, setProgress] = useState(0);
 
-  // Autoplay once — no loop, last frame freezes naturally
+  // Autoplay loop — plays continuously
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -54,35 +54,33 @@ export default function Hero() {
           <video
             ref={videoRef}
             muted
+            loop
             playsInline
             preload="auto"
             className="h-full w-full object-cover"
-            style={{ filter: "saturate(0.95) contrast(1.02) brightness(1.0)" }}
+            style={{ filter: "saturate(1.0) contrast(1.05) brightness(1.02)" }}
           >
             <source src="/FunnelSequence.mp4" type="video/mp4" />
           </video>
         </div>
 
-        {/* ── Overlays ── */}
-        {/* Minimal white tint */}
-        <div className="absolute inset-0 bg-white/[0.05]" aria-hidden="true" />
-
-        {/* Radial mask — centre open, edges dissolve */}
+        {/* ── Overlays — light touch, video stays dominant ── */}
+        {/* Radial edge fade — keeps centre fully clear, only edges blend to white */}
         <div
           className="absolute inset-0"
           aria-hidden="true"
           style={{
             background:
-              "radial-gradient(ellipse 80% 74% at 50% 50%, transparent 0%, rgba(255,255,255,0.22) 78%, white 94%)",
+              "radial-gradient(ellipse 85% 80% at 50% 50%, transparent 0%, rgba(255,255,255,0.10) 82%, white 96%)",
           }}
         />
 
-        {/* Edge vignettes */}
+        {/* Thin edge vignettes — just enough to anchor the video to the white page */}
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-white to-transparent" />
-          <div className="absolute inset-y-0 left-0 w-36 bg-gradient-to-r from-white to-transparent" />
-          <div className="absolute inset-y-0 right-0 w-36 bg-gradient-to-l from-white to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/80 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white to-transparent" />
+          <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white/60 to-transparent" />
+          <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-white/60 to-transparent" />
         </div>
 
         {/* ── Hero content — fades + rises on scroll ── */}

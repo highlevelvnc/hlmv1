@@ -6,6 +6,7 @@ import Services from "@/components/Services";
 import Differentiation from "@/components/Differentiation";
 import Proof from "@/components/Proof";
 import CTA from "@/components/CTA";
+import SignalPath from "@/components/SignalPath";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -38,17 +39,20 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <main>
-        <Hero />
-        <ScrollSequence />
+      {/* position: relative creates the stacking context SignalPath needs */}
+      <main className="relative">
+        <SignalPath />
+
+        <div id="s-hero"><Hero /></div>
+        <div id="s-scroll-seq"><ScrollSequence /></div>
         <SectionDivider />
-        <ValueProp />
+        <div id="s-value-prop"><ValueProp /></div>
         <Services />
         <SectionDivider />
         <Differentiation />
-        <Proof />
+        <div id="s-proof"><Proof /></div>
         <SectionDivider />
-        <CTA />
+        <div id="s-cta"><CTA /></div>
       </main>
     </>
   );

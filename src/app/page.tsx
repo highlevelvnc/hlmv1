@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import Hero from "@/components/Hero";
+import HeroParticles from "@/components/HeroParticles";
 import ScrollSequence from "@/components/ScrollSequence";
 import SectionDivider from "@/components/SectionDivider";
 import ValueProp from "@/components/ValueProp";
@@ -51,7 +51,7 @@ export default function Home() {
       <main className="relative">
         <SignalPath />
 
-        <div id="s-hero"><Hero /></div>
+        <div id="s-hero"><HeroParticles /></div>
         <div id="s-scroll-seq"><ScrollSequence /></div>
         <SectionDivider />
         <div id="s-value-prop"><ValueProp /></div>

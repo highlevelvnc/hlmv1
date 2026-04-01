@@ -68,7 +68,11 @@ export default function Hero() {
         </div>
 
         {/* Video — plays once, freezes on last frame */}
-        <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+        <div
+          className="absolute inset-0 flex items-center justify-center"
+          aria-hidden="true"
+          style={{ animation: "heroFadeIn 1.2s ease forwards" }}
+        >
           <video
             ref={videoRef}
             muted
@@ -99,7 +103,7 @@ export default function Hero() {
         {/* Edge vignettes */}
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
           <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-white to-transparent" />
           <div className="absolute inset-y-0 left-0 w-36 bg-gradient-to-r from-white to-transparent" />
           <div className="absolute inset-y-0 right-0 w-36 bg-gradient-to-l from-white to-transparent" />
         </div>

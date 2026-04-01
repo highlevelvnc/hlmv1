@@ -29,7 +29,7 @@ export default function ScrollSequence() {
   const [progress, setProgress] = useState(0);
   const prefersReducedRef = useRef(false);
 
-  // Setup: reduced-motion check + iOS video unlock
+  // Setup: reduced-motion check + iOS video unlock + lerp animation loop
   useEffect(() => {
     prefersReducedRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -41,7 +41,7 @@ export default function ScrollSequence() {
       return;
     }
 
-    // iOS unlock: play then immediately pause so currentTime seeking is unblocked
+    // iOS unlock
     const unlock = () => {
       video.play().then(() => {
         video.pause();
@@ -54,21 +54,38 @@ export default function ScrollSequence() {
     } else {
       video.addEventListener("loadedmetadata", unlock, { once: true });
     }
+
+    // Lerp-based smooth seeking
+    let currentTime = 0;
+    let rafId: number;
+
+    const animate = () => {
+      if (video.duration && targetTimeRef.current >= 0) {
+        currentTime += (targetTimeRef.current - currentTime) * 0.07;
+
+        if (Math.abs(currentTime - targetTimeRef.current) > 0.005) {
+          try {
+            video.currentTime = currentTime;
+          } catch {
+            // ignore
+          }
+        }
+      }
+      rafId = requestAnimationFrame(animate);
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
   }, []);
 
-  // Seek video frame in sync with scroll progress
+  // Ref to pass target time from progress into the RAF loop
+  const targetTimeRef = useRef(-1);
+
+  // Update target time whenever progress changes
   useEffect(() => {
     const video = videoRef.current;
     if (!video || prefersReducedRef.current || !video.duration) return;
-
-    const targetTime = progress * video.duration;
-    try {
-      const media = video as HTMLVideoElement & { fastSeek?: (time: number) => void };
-      if (typeof media.fastSeek === "function") media.fastSeek(targetTime);
-      else video.currentTime = targetTime;
-    } catch {
-      // ignore seeking errors
-    }
+    targetTimeRef.current = progress * video.duration;
   }, [progress]);
 
   // Scroll progress tracking

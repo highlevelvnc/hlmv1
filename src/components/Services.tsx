@@ -39,7 +39,16 @@ export default function Services() {
       {/* Soft gradient transition in — white to neutral-50 */}
       <div className="h-20 bg-gradient-to-b from-white to-neutral-50/60" />
 
-      <div className="bg-neutral-50/60 px-6 py-28 sm:py-40">
+      <div className="relative bg-neutral-50/60 px-6 py-28 sm:py-40">
+        {/* Decorative dot row — top right */}
+        <div className="pointer-events-none absolute right-10 top-20 opacity-[0.05]" aria-hidden="true">
+          <div className="flex gap-2.5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-1 w-1 rounded-full bg-neutral-500" />
+            ))}
+          </div>
+        </div>
+
         <div className="mx-auto max-w-5xl">
           <FadeIn>
             <div className="mb-20 flex items-center gap-6">

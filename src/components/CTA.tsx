@@ -73,7 +73,7 @@ export default function CTA() {
 
           <FadeIn delay={360}>
             <a
-              href="mailto:hello@hlm.com"
+              href="mailto:contato@highlevelmkt.com"
               className="group relative mt-16 inline-flex items-center gap-4 overflow-hidden rounded-full border border-neutral-200 px-10 py-4 text-sm font-light tracking-widest text-neutral-800 transition-all duration-700 hover:border-neutral-400 hover:tracking-[0.2em]"
             >
               {/* Hover fill */}
@@ -84,9 +84,14 @@ export default function CTA() {
           </FadeIn>
 
           <FadeIn delay={440}>
-            <span className="mt-8 text-xs font-light tracking-wide text-neutral-400">
-              hello@hlm.com
-            </span>
+            <div className="mt-8 flex flex-col items-center gap-1.5">
+              <span className="text-xs font-light tracking-wide text-neutral-400">
+                contato@highlevelmkt.com
+              </span>
+              <span className="text-xs font-light tracking-wide text-neutral-400">
+                +351 934 071 660
+              </span>
+            </div>
           </FadeIn>
         </div>
       </div>

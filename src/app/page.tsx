@@ -17,7 +17,8 @@ const jsonLd = {
     "HLM builds intelligent revenue systems — combining paid traffic, automation, and AI to help operators grow predictably.",
   contactPoint: {
     "@type": "ContactPoint",
-    email: "hello@hlm.com",
+    email: "contato@highlevelmkt.com",
+    telephone: "+351934071660",
     contactType: "sales",
   },
   knowsAbout: [

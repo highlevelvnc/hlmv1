@@ -30,24 +30,39 @@ export default function Hero() {
       video.addEventListener("loadedmetadata", unlock, { once: true });
     }
 
-    const seekTo = (t: number) => {
-      try {
-        const media = video as HTMLVideoElement & { fastSeek?: (time: number) => void };
-        if (typeof media.fastSeek === "function") media.fastSeek(t);
-        else video.currentTime = t;
-      } catch {
-        // ignore — may fire before metadata is ready
+    // Lerp-based smooth seeking — scroll sets target, RAF eases toward it
+    let currentTime = 0;
+    let targetTime = 0;
+    let rafId: number;
+
+    const animate = () => {
+      if (video.duration) {
+        currentTime += (targetTime - currentTime) * 0.07;
+
+        if (Math.abs(currentTime - targetTime) > 0.005) {
+          try {
+            video.currentTime = currentTime;
+          } catch {
+            // ignore seeking errors before metadata
+          }
+        }
       }
+      rafId = requestAnimationFrame(animate);
     };
 
     const handleScroll = () => {
       if (!video.duration) return;
       const progress = Math.max(0, Math.min(1, window.scrollY / window.innerHeight));
-      seekTo(progress * video.duration);
+      targetTime = progress * video.duration;
     };
 
+    rafId = requestAnimationFrame(animate);
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   return (
@@ -66,6 +81,11 @@ export default function Hero() {
           style={{ height: "auto" }}
           fetchPriority="high"
         />
+      </div>
+
+      {/* Language switcher — top right */}
+      <div className="absolute top-9 right-8 z-20">
+        <LanguageSwitcher />
       </div>
 
       {/* Decorative video layer */}
@@ -107,12 +127,40 @@ export default function Hero() {
 
       {/* Hero content */}
       <div className="relative z-10 flex flex-col items-center gap-6 px-6 text-center">
-        {/* Visually hidden h1 — preserves heading structure for SEO/a11y; logo carries visual brand */}
         <h1 className="sr-only">HLM — Intelligent Revenue Systems</h1>
         <p className="max-w-md text-base font-light leading-relaxed tracking-wide text-neutral-500">
           Intelligent systems, refined by design.
         </p>
       </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10" aria-hidden="true">
+        <div className="flex flex-col items-center gap-2 opacity-40">
+          <span className="text-[10px] font-light tracking-[0.3em] text-neutral-400">SCROLL</span>
+          <div
+            className="h-8 w-px bg-gradient-to-b from-neutral-300 to-transparent"
+            style={{ animation: "scrollPulse 2.5s ease-in-out infinite" }}
+          />
+        </div>
+      </div>
     </section>
+  );
+}
+
+/* ── Inline language switcher ── */
+function LanguageSwitcher() {
+  return (
+    <div className="flex items-center gap-0.5">
+      {(["PT", "EN", "DE", "FR"] as const).map((lang, i) => (
+        <span key={lang} className="flex items-center">
+          {i > 0 && <span className="mx-1 text-neutral-200 text-[10px] select-none">/</span>}
+          <button
+            className="text-[11px] font-light tracking-wider text-neutral-400 transition-colors duration-300 hover:text-neutral-800 cursor-pointer"
+          >
+            {lang}
+          </button>
+        </span>
+      ))}
+    </div>
   );
 }

@@ -15,6 +15,27 @@ export default function ValueProp() {
         }}
       />
 
+      {/* Decorative floating ring — top right */}
+      <div
+        className="pointer-events-none absolute -right-20 top-24 opacity-[0.04]"
+        style={{ animation: "float 18s ease-in-out infinite" }}
+        aria-hidden="true"
+      >
+        <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
+          <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="0.5" className="text-neutral-500" />
+          <circle cx="100" cy="100" r="40" stroke="currentColor" strokeWidth="0.5" className="text-neutral-500" />
+        </svg>
+      </div>
+
+      {/* Decorative dot cluster — bottom left */}
+      <div className="pointer-events-none absolute bottom-20 left-12 opacity-[0.06]" aria-hidden="true">
+        <div className="grid grid-cols-3 gap-3">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div key={i} className="h-1 w-1 rounded-full bg-neutral-400" />
+          ))}
+        </div>
+      </div>
+
       <div className="relative mx-auto max-w-5xl">
         <FadeIn>
           <div className="mb-14 flex items-center gap-6">

@@ -38,6 +38,19 @@ export default function Differentiation() {
         }}
       />
 
+      {/* Decorative cross-hair — top left */}
+      <div
+        className="pointer-events-none absolute left-16 top-28 opacity-[0.05]"
+        style={{ animation: "float 22s ease-in-out infinite reverse" }}
+        aria-hidden="true"
+      >
+        <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+          <line x1="30" y1="0" x2="30" y2="60" stroke="currentColor" strokeWidth="0.5" className="text-neutral-500" />
+          <line x1="0" y1="30" x2="60" y2="30" stroke="currentColor" strokeWidth="0.5" className="text-neutral-500" />
+          <circle cx="30" cy="30" r="12" stroke="currentColor" strokeWidth="0.5" className="text-neutral-500" />
+        </svg>
+      </div>
+
       <div className="mx-auto max-w-5xl">
         {/* Header — staggered composition */}
         <div className="mb-24 sm:mb-32">

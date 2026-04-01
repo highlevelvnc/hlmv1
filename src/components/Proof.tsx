@@ -1,9 +1,9 @@
 import FadeIn from "./FadeIn";
 
 const metrics = [
-  { value: "$42M+", label: "Revenue attributed to HLM systems" },
+  { value: "$3M+", label: "Revenue attributed to HLM systems" },
   { value: "4.8×", label: "Average return on ad spend" },
-  { value: "300+", label: "Automated pipelines deployed" },
+  { value: "50+", label: "Automated pipelines deployed" },
   { value: "97%", label: "Client retention over 12 months" },
 ];
 

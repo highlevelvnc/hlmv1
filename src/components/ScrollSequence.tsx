@@ -61,9 +61,9 @@ export default function ScrollSequence() {
 
     const animate = () => {
       if (video.duration && targetTimeRef.current >= 0) {
-        currentTime += (targetTimeRef.current - currentTime) * 0.06;
+        currentTime += (targetTimeRef.current - currentTime) * 0.12;
 
-        if (Math.abs(currentTime - targetTimeRef.current) > 0.005) {
+        if (Math.abs(currentTime - targetTimeRef.current) > 0.001) {
           try {
             video.currentTime = currentTime;
           } catch {
@@ -148,7 +148,7 @@ export default function ScrollSequence() {
             ref={videoRef}
             muted
             playsInline
-            preload="metadata"
+            preload="auto"
             className="h-full w-full object-cover"
             style={{
               filter: "saturate(0.92) contrast(1.0) brightness(1.0)",

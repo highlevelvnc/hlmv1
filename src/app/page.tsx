@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ScrollSequence from "@/components/ScrollSequence";
 import SectionDivider from "@/components/SectionDivider";
@@ -39,6 +40,9 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {/* Header — fixed, revealed on scroll */}
+      <Header />
+
       {/* position: relative creates the stacking context SignalPath needs */}
       <main className="relative">
         <SignalPath />

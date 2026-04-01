@@ -1,69 +1,189 @@
+"use client";
+
+import { useState } from "react";
 import FadeIn from "./FadeIn";
 
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface FormState  { name: string; email: string; message: string }
+interface FormErrors { name?: string; email?: string; message?: string }
+
+// ─── Field sub-component ─────────────────────────────────────────────────────
+
+function Field({
+  label,
+  error,
+  active,
+  children,
+}: {
+  label: string;
+  error?: string;
+  active: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col">
+      {/* Label */}
+      <label
+        className="mb-2.5 text-[10px] font-light tracking-[0.25em] transition-colors duration-200"
+        style={{ color: active ? "rgb(64,64,64)" : "rgb(163,163,163)" }}
+      >
+        {label.toUpperCase()}
+      </label>
+
+      {/* Input slot */}
+      {children}
+
+      {/* Underline — the only visible border */}
+      <div
+        className="mt-0 h-px transition-colors duration-300"
+        style={{
+          backgroundColor: error
+            ? "rgba(180,140,120,0.6)"
+            : active
+            ? "rgb(64,64,64)"
+            : "rgb(229,229,229)",
+        }}
+      />
+
+      {/* Inline error */}
+      {error && (
+        <span className="mt-1.5 text-[11px] font-light text-neutral-400">
+          {error}
+        </span>
+      )}
+    </div>
+  );
+}
+
+// ─── Success state ────────────────────────────────────────────────────────────
+
+function SuccessMessage() {
+  return (
+    <div className="flex flex-col items-center gap-5 py-10 text-center">
+      <div className="h-px w-10 bg-neutral-300" />
+      <p className="text-[15px] font-light leading-[1.85] text-neutral-600">
+        Thank you — we&apos;ll be in touch within 24 hours.
+      </p>
+      <p className="text-[11px] font-light tracking-wide text-neutral-400">
+        contato@highlevelmkt.com
+      </p>
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export default function CTA() {
+  const [form, setForm]           = useState<FormState>({ name: "", email: "", message: "" });
+  const [errors, setErrors]       = useState<FormErrors>({});
+  const [focused, setFocused]     = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted]   = useState(false);
+  const [serverError, setServerError] = useState(false);
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  const change = (field: keyof FormState, value: string) => {
+    setForm(p => ({ ...p, [field]: value }));
+    if (errors[field]) setErrors(p => ({ ...p, [field]: undefined }));
+  };
+
+  const validate = (): FormErrors => {
+    const e: FormErrors = {};
+    if (!form.name.trim())                                      e.name    = "Required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email   = "Valid work email required";
+    if (form.message.trim().length < 5)                         e.message = "Required";
+    return e;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length) { setErrors(errs); return; }
+
+    setSubmitting(true);
+    setServerError(false);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error();
+      setSubmitted(true);
+    } catch {
+      setServerError(true);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // ── Render ────────────────────────────────────────────────────────────────
+
   return (
     <section className="relative w-full overflow-hidden bg-white px-6">
-      {/* Main CTA area — full viewport height for gravity */}
+
+      {/* ── Main CTA area ── */}
       <div className="relative flex min-h-screen flex-col items-center justify-center py-40">
-        {/* Atmospheric layer 1 — large slow drift */}
+
+        {/* Atmospheric layer 1 */}
         <div
           className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          aria-hidden="true"
           style={{
-            width: "1200px",
-            height: "900px",
-            background:
-              "radial-gradient(ellipse at center, rgba(0,0,0,0.022) 0%, transparent 55%)",
+            width: "1200px", height: "900px",
+            background: "radial-gradient(ellipse at center, rgba(0,0,0,0.022) 0%, transparent 55%)",
             animation: "drift 30s ease-in-out infinite",
           }}
         />
 
-        {/* Atmospheric layer 2 — smaller, offset, counter-direction */}
+        {/* Atmospheric layer 2 */}
         <div
           className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          aria-hidden="true"
           style={{
-            width: "600px",
-            height: "400px",
-            background:
-              "radial-gradient(ellipse at center, rgba(0,0,0,0.015) 0%, transparent 65%)",
+            width: "600px", height: "400px",
+            background: "radial-gradient(ellipse at center, rgba(0,0,0,0.015) 0%, transparent 65%)",
             animation: "drift 20s ease-in-out infinite reverse",
           }}
         />
 
-        {/* Convergence lines — suggesting system conclusion */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <svg
-            width="400"
-            height="400"
-            viewBox="0 0 400 400"
-            fill="none"
-            className="opacity-[0.04]"
-          >
-            {/* Concentric rings suggesting convergence */}
+        {/* Convergence rings */}
+        <div
+          className="pointer-events-none absolute inset-0 flex items-center justify-center"
+          aria-hidden="true"
+        >
+          <svg width="400" height="400" viewBox="0 0 400 400" fill="none" className="opacity-[0.04]">
             <circle cx="200" cy="200" r="180" stroke="currentColor" strokeWidth="0.5" className="text-neutral-500" />
             <circle cx="200" cy="200" r="120" stroke="currentColor" strokeWidth="0.5" className="text-neutral-500" />
-            <circle cx="200" cy="200" r="60" stroke="currentColor" strokeWidth="0.5" className="text-neutral-500" />
+            <circle cx="200" cy="200" r="60"  stroke="currentColor" strokeWidth="0.5" className="text-neutral-500" />
           </svg>
         </div>
 
-        <div className="relative flex flex-col items-center text-center">
+        {/* ── Content ── */}
+        <div className="relative flex w-full flex-col items-center text-center">
+
+          {/* Label */}
           <FadeIn>
             <div className="mb-14 flex items-center gap-6">
               <div className="h-px w-10 bg-neutral-300" />
-              <span className="text-xs font-medium tracking-[0.35em] text-neutral-400">
-                START HERE
-              </span>
+              <span className="text-xs font-medium tracking-[0.35em] text-neutral-400">START HERE</span>
               <div className="h-px w-10 bg-neutral-300" />
             </div>
           </FadeIn>
 
+          {/* Headline */}
           <FadeIn delay={120}>
-            <h2 className="text-[2.75rem] font-extralight leading-[1.08] tracking-tight text-neutral-900 sm:text-[5rem] max-w-3xl">
+            <h2 className="max-w-3xl text-[2.75rem] font-extralight leading-[1.08] tracking-tight text-neutral-900 sm:text-[5rem]">
               Ready to build your
               <br />
               revenue system?
             </h2>
           </FadeIn>
 
+          {/* Scarcity sub-copy */}
           <FadeIn delay={240}>
             <p className="mt-10 max-w-md text-[15px] font-light leading-[1.85] text-neutral-500">
               We work with a select number of operators each quarter.
@@ -71,32 +191,119 @@ export default function CTA() {
             </p>
           </FadeIn>
 
+          {/* ── Form / Success ── */}
           <FadeIn delay={360}>
-            <a
-              href="mailto:contato@highlevelmkt.com"
-              className="group relative mt-16 inline-flex items-center gap-4 overflow-hidden rounded-full border border-neutral-200 px-10 py-4 text-sm font-light tracking-widest text-neutral-800 transition-all duration-700 hover:border-neutral-400 hover:tracking-[0.2em]"
-            >
-              {/* Hover fill */}
-              <span className="absolute inset-0 bg-neutral-50 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-              <span className="relative">START A CONVERSATION</span>
-              <span className="relative h-px w-6 bg-neutral-400 transition-all duration-500 group-hover:w-10" />
-            </a>
-          </FadeIn>
+            <div className="mt-16 w-full max-w-[420px] text-left">
 
-          <FadeIn delay={440}>
-            <div className="mt-8 flex flex-col items-center gap-1.5">
-              <span className="text-xs font-light tracking-wide text-neutral-400">
-                contato@highlevelmkt.com
-              </span>
-              <span className="text-xs font-light tracking-wide text-neutral-400">
-                +351 934 071 660
-              </span>
+              {submitted ? (
+                <SuccessMessage />
+              ) : (
+                <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-8">
+
+                  {/* Name */}
+                  <Field label="Your name" error={errors.name} active={focused === "name"}>
+                    <input
+                      type="text"
+                      value={form.name}
+                      autoComplete="name"
+                      className="w-full bg-transparent py-2 text-[15px] font-light text-neutral-900 outline-none placeholder:text-neutral-300"
+                      onChange={e => change("name", e.target.value)}
+                      onFocus={() => setFocused("name")}
+                      onBlur={() => setFocused(null)}
+                    />
+                  </Field>
+
+                  {/* Work email */}
+                  <Field label="Work email" error={errors.email} active={focused === "email"}>
+                    <input
+                      type="email"
+                      value={form.email}
+                      autoComplete="email"
+                      className="w-full bg-transparent py-2 text-[15px] font-light text-neutral-900 outline-none placeholder:text-neutral-300"
+                      onChange={e => change("email", e.target.value)}
+                      onFocus={() => setFocused("email")}
+                      onBlur={() => setFocused(null)}
+                    />
+                  </Field>
+
+                  {/* Message */}
+                  <Field label="What are you building?" error={errors.message} active={focused === "message"}>
+                    <textarea
+                      value={form.message}
+                      rows={2}
+                      className="w-full resize-none bg-transparent py-2 text-[15px] font-light leading-[1.7] text-neutral-900 outline-none placeholder:text-neutral-300"
+                      onChange={e => change("message", e.target.value)}
+                      onFocus={() => setFocused("message")}
+                      onBlur={() => setFocused(null)}
+                    />
+                  </Field>
+
+                  {/* Submit */}
+                  <div className="pt-3">
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="group relative w-full overflow-hidden py-[18px] text-[11px] font-light tracking-[0.28em] text-white outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                      style={{ backgroundColor: "rgb(23,23,23)" }}
+                      onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgb(38,38,38)"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgb(23,23,23)"; }}
+                    >
+                      <span
+                        className="relative flex items-center justify-center gap-5"
+                        style={{ transition: "gap 500ms ease" }}
+                      >
+                        {submitting ? (
+                          <>
+                            <span className="inline-block h-3 w-3 animate-spin rounded-full border border-white/30 border-t-white/80" />
+                            <span>SENDING</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>REQUEST A CONVERSATION</span>
+                            {/* Expanding dash on hover */}
+                            <span
+                              className="h-px bg-white/50 transition-all duration-500 group-hover:w-8"
+                              style={{ width: "20px" }}
+                            />
+                          </>
+                        )}
+                      </span>
+                    </button>
+
+                    {/* Server error */}
+                    {serverError && (
+                      <p className="mt-4 text-center text-[11px] font-light text-neutral-400">
+                        Something went wrong. Email us directly at{" "}
+                        <a
+                          href="mailto:contato@highlevelmkt.com"
+                          className="text-neutral-500 underline underline-offset-2 hover:text-neutral-700"
+                        >
+                          contato@highlevelmkt.com
+                        </a>
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Fallback */}
+                  <p className="text-center text-[11px] font-light leading-relaxed text-neutral-400">
+                    Or reach us at{" "}
+                    <a
+                      href="mailto:contato@highlevelmkt.com"
+                      className="transition-colors duration-300 hover:text-neutral-600"
+                    >
+                      contato@highlevelmkt.com
+                    </a>
+                  </p>
+
+                </form>
+              )}
             </div>
           </FadeIn>
+
         </div>
       </div>
 
-      {/* Footer */}
+      {/* ── Footer ── */}
       <div className="mx-auto max-w-5xl border-t border-neutral-100 px-0 py-10">
         <FadeIn delay={100}>
           <div className="flex items-center justify-between">
@@ -112,6 +319,7 @@ export default function CTA() {
           </div>
         </FadeIn>
       </div>
+
     </section>
   );
 }

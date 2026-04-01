@@ -55,7 +55,6 @@ export default function Home() {
         <SectionDivider />
         <Differentiation />
         <div id="s-proof"><Proof /></div>
-        <SectionDivider />
         <div id="s-cta"><CTA /></div>
       </main>
     </>

@@ -7,24 +7,28 @@ import FadeIn from "./FadeIn";
 
 const METRICS = [
   {
-    to:     3,
-    format: (n: number) => `$${Math.round(n)}M+`,
-    label:  "Revenue attributed to HLM systems",
+    to:      3,
+    format:  (n: number) => `$${Math.round(n)}M+`,
+    label:   "Revenue attributed to HLM systems",
+    primary: true,   // anchor metric — subtly brighter
   },
   {
-    to:     4.8,
-    format: (n: number) => `${n.toFixed(1)}×`,
-    label:  "Average return on ad spend",
+    to:      4.8,
+    format:  (n: number) => `${n.toFixed(1)}×`,
+    label:   "Average return on ad spend",
+    primary: false,
   },
   {
-    to:     50,
-    format: (n: number) => `${Math.round(n)}+`,
-    label:  "Automated pipelines deployed",
+    to:      50,
+    format:  (n: number) => `${Math.round(n)}+`,
+    label:   "Automated pipelines deployed",
+    primary: false,
   },
   {
-    to:     97,
-    format: (n: number) => `${Math.round(n)}%`,
-    label:  "Client retention over 12 months",
+    to:      97,
+    format:  (n: number) => `${Math.round(n)}%`,
+    label:   "Client retention over 12 months",
+    primary: false,
   },
 ] as const;
 
@@ -123,16 +127,19 @@ export default function Proof() {
               {METRICS.map((m, i) => (
                 <FadeIn key={m.label} delay={i * 90}>
                   <div className="flex flex-col gap-4">
-                    {/* Number — slightly larger on dark for impact */}
-                    <span className="text-[3.25rem] font-[200] leading-none tracking-tight text-neutral-100 sm:text-[4rem]">
+                    {/* Number — primary metric is pure white, others slightly dimmed */}
+                    <span
+                      className="text-[3.25rem] font-[200] leading-none tracking-tight sm:text-[4rem]"
+                      style={{ color: m.primary ? "rgb(255,255,255)" : "rgb(244,244,245)" }}
+                    >
                       <CountUp to={m.to} format={m.format} />
                     </span>
 
-                    {/* Thin rule between number and label */}
+                    {/* Thin rule */}
                     <div className="h-px w-8 bg-neutral-800" />
 
-                    {/* Label */}
-                    <span className="text-xs font-light leading-[1.7] text-neutral-500">
+                    {/* Label — neutral-400 on dark reads clearly without glare */}
+                    <span className="text-xs font-light leading-[1.7] text-neutral-400">
                       {m.label}
                     </span>
                   </div>
@@ -164,7 +171,7 @@ export default function Proof() {
                     <span className="text-xs font-normal tracking-wide text-neutral-400">
                       {t.author}
                     </span>
-                    <span className="text-[11px] font-light text-neutral-600">
+                    <span className="text-[11px] font-light text-neutral-500">
                       {t.company}
                     </span>
                   </div>

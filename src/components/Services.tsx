@@ -3,31 +3,31 @@ import FadeIn from "./FadeIn";
 const services = [
   {
     index: "01",
-    name: "Paid Traffic",
+    name:  "Paid Traffic",
     description:
       "Precision acquisition across Google, Meta, and emerging channels. Every euro tracked from impression to closed deal.",
   },
   {
     index: "02",
-    name: "Automation",
+    name:  "Automation",
     description:
       "End-to-end workflows that capture, qualify, nurture, and close — operating at scale without manual overhead.",
   },
   {
     index: "03",
-    name: "AI Solutions",
+    name:  "AI Solutions",
     description:
       "Custom intelligence layers: lead scoring, predictive routing, dynamic personalization, and continuous optimization.",
   },
   {
     index: "04",
-    name: "Landing Pages",
+    name:  "Landing Pages",
     description:
       "Conversion architecture built for performance. Every element serves the funnel. Nothing decorative.",
   },
   {
     index: "05",
-    name: "Content Production",
+    name:  "Content Production",
     description:
       "Strategic content that compounds authority, fuels distribution, and accelerates every stage of the pipeline.",
   },
@@ -36,33 +36,12 @@ const services = [
 export default function Services() {
   return (
     <section className="relative w-full overflow-hidden">
-      {/* Soft gradient transition in — white to neutral-50 */}
+      {/* White → off-white */}
       <div className="h-20 bg-gradient-to-b from-white to-neutral-50/60" />
 
       <div className="relative bg-neutral-50/60 px-6 py-28 sm:py-40">
-        {/* Ambient light drift — slow-moving, nearly invisible */}
-        <div
-          className="pointer-events-none absolute left-1/3 top-1/2 -translate-x-1/2 -translate-y-1/2"
-          aria-hidden="true"
-          style={{
-            width: "900px",
-            height: "600px",
-            background:
-              "radial-gradient(ellipse at center, rgba(0,0,0,0.018) 0%, transparent 60%)",
-            animation: "drift 28s ease-in-out infinite",
-          }}
-        />
-
-        {/* Decorative dot row — top right */}
-        <div className="pointer-events-none absolute right-10 top-20 opacity-[0.05]" aria-hidden="true">
-          <div className="flex gap-2.5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-1 w-1 rounded-full bg-neutral-500" />
-            ))}
-          </div>
-        </div>
-
         <div className="mx-auto max-w-5xl">
+
           <FadeIn>
             <div className="mb-20 flex items-center gap-6">
               <div className="h-px w-10 bg-neutral-300" />
@@ -76,34 +55,35 @@ export default function Services() {
             {services.map((s, i) => (
               <FadeIn key={s.index} delay={i * 70}>
                 <div className="group relative grid grid-cols-1 gap-6 border-t border-neutral-200/70 py-12 sm:grid-cols-12 sm:items-baseline sm:gap-8">
+
                   {/* Index */}
                   <span className="text-[11px] font-light tracking-wider text-neutral-300 sm:col-span-1">
                     {s.index}
                   </span>
 
-                  {/* Name — large, commanding */}
-                  <h3 className="text-2xl font-extralight tracking-tight text-neutral-800 transition-colors duration-500 group-hover:text-neutral-500 sm:col-span-4 sm:text-[1.75rem]">
+                  {/* Name — darkens on hover (correct direction) */}
+                  <h3 className="text-2xl font-extralight tracking-tight text-neutral-700 transition-colors duration-500 group-hover:text-neutral-950 sm:col-span-4 sm:text-[1.75rem]">
                     {s.name}
                   </h3>
 
-                  {/* Description — offset right */}
+                  {/* Description */}
                   <p className="text-sm font-light leading-[1.85] text-neutral-500 sm:col-span-6 sm:col-start-7">
                     {s.description}
                   </p>
 
-                  {/* Hover accent line with glow */}
-                  <div className="absolute bottom-0 left-0 h-px w-0 bg-neutral-300 transition-all duration-700 group-hover:w-24" />
-                  <div className="absolute bottom-0 left-0 h-px w-0 bg-neutral-300/50 blur-sm transition-all duration-700 group-hover:w-32" />
+                  {/* Hover accent line */}
+                  <div className="absolute bottom-0 left-0 h-px w-0 bg-neutral-400 transition-all duration-700 group-hover:w-24" />
                 </div>
               </FadeIn>
             ))}
             {/* Closing border */}
             <div className="border-t border-neutral-200/70" />
           </div>
+
         </div>
       </div>
 
-      {/* Soft gradient transition out — neutral-50 to white */}
+      {/* Off-white → white */}
       <div className="h-20 bg-gradient-to-b from-neutral-50/60 to-white" />
     </section>
   );

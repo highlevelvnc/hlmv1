@@ -1,39 +1,17 @@
-import FadeIn from "./FadeIn";
+"use client";
 
-const services = [
-  {
-    index: "01",
-    name:  "Paid Traffic",
-    description:
-      "Precision acquisition across Google, Meta, and emerging channels. Every euro tracked from impression to closed deal.",
-  },
-  {
-    index: "02",
-    name:  "Automation",
-    description:
-      "End-to-end workflows that capture, qualify, nurture, and close — operating at scale without manual overhead.",
-  },
-  {
-    index: "03",
-    name:  "AI Solutions",
-    description:
-      "Custom intelligence layers: lead scoring, predictive routing, dynamic personalization, and continuous optimization.",
-  },
-  {
-    index: "04",
-    name:  "Landing Pages",
-    description:
-      "Conversion architecture built for performance. Every element serves the funnel. Nothing decorative.",
-  },
-  {
-    index: "05",
-    name:  "Content Production",
-    description:
-      "Strategic content that compounds authority, fuels distribution, and accelerates every stage of the pipeline.",
-  },
-];
+import FadeIn from "./FadeIn";
+import { useT } from "@/i18n/context";
 
 export default function Services() {
+  const t = useT();
+  const services = [
+    { index: "01", name: t.svc1_name, description: t.svc1_desc },
+    { index: "02", name: t.svc2_name, description: t.svc2_desc },
+    { index: "03", name: t.svc3_name, description: t.svc3_desc },
+    { index: "04", name: t.svc4_name, description: t.svc4_desc },
+    { index: "05", name: t.svc5_name, description: t.svc5_desc },
+  ];
   return (
     <section className="relative w-full overflow-hidden">
       {/* White → off-white */}
@@ -46,7 +24,7 @@ export default function Services() {
             <div className="mb-20 flex items-center gap-6">
               <div className="h-px w-10 bg-neutral-300" />
               <span className="text-xs font-medium tracking-[0.35em] text-neutral-400">
-                CAPABILITIES
+                {t.svc_tag}
               </span>
             </div>
           </FadeIn>

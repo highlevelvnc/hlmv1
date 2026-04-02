@@ -1,29 +1,16 @@
-import FadeIn from "./FadeIn";
+"use client";
 
-const pillars = [
-  {
-    index: "I",
-    label: "SYSTEMS, NOT SERVICES",
-    body:  "We don't deliver reports. We install revenue infrastructure that runs autonomously, compounds over time, and integrates across your entire operation.",
-  },
-  {
-    index: "II",
-    label: "INTELLIGENCE AT EVERY LAYER",
-    body:  "AI isn't a feature we offer — it's the operating layer. From the first ad impression to the final conversion, every decision is data-driven and machine-assisted.",
-  },
-  {
-    index: "III",
-    label: "FULL-STACK EXECUTION",
-    body:  "Strategy, creative, tech, and distribution — all under one roof. No briefing agencies. No coordination overhead. Faster cycle times, tighter feedback loops.",
-  },
-  {
-    index: "IV",
-    label: "PERFORMANCE IS THE PRODUCT",
-    body:  "We are measured exclusively by outcomes. Pipeline generated, ROAS achieved, cost per acquisition reduced. Everything else is noise.",
-  },
-];
+import FadeIn from "./FadeIn";
+import { useT } from "@/i18n/context";
 
 export default function Differentiation() {
+  const t = useT();
+  const pillars = [
+    { index: "I",   label: t.diff1_label, body: t.diff1_body },
+    { index: "II",  label: t.diff2_label, body: t.diff2_body },
+    { index: "III", label: t.diff3_label, body: t.diff3_body },
+    { index: "IV",  label: t.diff4_label, body: t.diff4_body },
+  ];
   return (
     <section className="relative w-full bg-white px-6 py-36 sm:py-48">
       <div className="mx-auto max-w-5xl">
@@ -34,14 +21,14 @@ export default function Differentiation() {
             <div className="mb-14 flex items-center gap-6">
               <div className="h-px w-10 bg-neutral-300" />
               <span className="text-xs font-medium tracking-[0.35em] text-neutral-400">
-                WHY HLM
+                {t.diff_tag}
               </span>
             </div>
           </FadeIn>
 
           <FadeIn delay={120}>
             <h2 className="max-w-2xl text-[2.5rem] font-extralight leading-[1.12] tracking-tight text-neutral-900 sm:text-[3.5rem]">
-              Built for the operators who refuse to settle.
+              {t.diff_headline}
             </h2>
           </FadeIn>
         </div>

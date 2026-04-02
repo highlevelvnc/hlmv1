@@ -10,47 +10,43 @@ import Proof from "@/components/Proof";
 import CTA from "@/components/CTA";
 import SignalPath from "@/components/SignalPath";
 import FloatingOrb from "@/components/FloatingOrb";
+import { getLang } from "@/i18n/get-lang";
+import { getDict } from "@/i18n/dictionaries";
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "HLM",
-  url: "https://hlm.com",
-  logo: "https://hlm.com/logo.png",
-  description:
-    "HLM builds intelligent revenue systems — combining paid traffic, automation, and AI to help operators grow predictably.",
-  contactPoint: {
-    "@type": "ContactPoint",
-    email: "contato@highlevelmkt.com",
-    telephone: "+351934071660",
-    contactType: "sales",
-  },
-  knowsAbout: [
-    "Revenue Systems",
-    "Paid Traffic",
-    "Marketing Automation",
-    "AI Solutions",
-    "Lead Generation",
-    "Conversion Optimization",
-  ],
-};
+export default async function Home() {
+  const lang = await getLang();
+  const dict = getDict(lang);
 
-export default function Home() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "HLM",
+    url: "https://hlm.com",
+    logo: "https://hlm.com/logo.png",
+    description: dict.meta_description,
+    contactPoint: {
+      "@type": "ContactPoint",
+      email: "contato@highlevelmkt.com",
+      telephone: "+351934071660",
+      contactType: "sales",
+    },
+    knowsAbout: [
+      "Revenue Systems", "Paid Traffic", "Marketing Automation",
+      "AI Solutions", "Lead Generation", "Conversion Optimization",
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* Header — fixed, revealed on scroll */}
       <Header />
-      {/* Floating orb — scroll companion */}
       <FloatingOrb />
 
-      {/* position: relative creates the stacking context SignalPath needs */}
       <main className="relative">
         <SignalPath />
-
         <div id="s-hero"><HeroParticles /></div>
         <div id="s-scroll-seq"><ScrollSequence /></div>
         <SectionDivider />

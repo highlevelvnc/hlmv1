@@ -1,29 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
-const stages = [
-  {
-    label: "CAPTURE",
-    title: "Traffic enters the system.",
-    description:
-      "Every touchpoint is tracked, every signal captured. The funnel begins before the first click.",
-  },
-  {
-    label: "PROCESS",
-    title: "Data becomes intelligence.",
-    description:
-      "Patterns are recognized, intent is scored, and every lead is routed with precision.",
-  },
-  {
-    label: "CONVERT",
-    title: "Actions that compound.",
-    description:
-      "Automated sequences, personalized journeys, and real-time optimization — working while you sleep.",
-  },
-];
+import { useT } from "@/i18n/context";
 
 export default function ScrollSequence() {
+  const t = useT();
+  const stages = [
+    { label: t.scroll_s1_label, title: t.scroll_s1_title, description: t.scroll_s1_desc },
+    { label: t.scroll_s2_label, title: t.scroll_s2_title, description: t.scroll_s2_desc },
+    { label: t.scroll_s3_label, title: t.scroll_s3_title, description: t.scroll_s3_desc },
+  ];
   const sectionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [progress, setProgress] = useState(0);

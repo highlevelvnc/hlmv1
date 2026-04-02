@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useT } from "@/i18n/context";
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
@@ -22,10 +23,8 @@ interface Node3D {
 }
 interface Conn { a: number; b: number }
 
-const LABELS = [
-  "Traffic", "Leads", "Pipeline", "Revenue",
-  "ROAS 4.8×", "Automation", "AI Scoring", "Conversion",
-];
+// LABELS built inside component from useT() — see below
+let LABELS: string[] = [];
 
 // ─── Generators ───────────────────────────────────────────────────────────────
 
@@ -74,6 +73,10 @@ function proj3d(nx: number, ny: number, nz: number, cx: number, cy: number, r: n
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function BrainOrb() {
+  const t = useT();
+  // Set module-level LABELS from translated dict
+  LABELS = [t.orb_traffic, t.orb_leads, t.orb_pipeline, t.orb_revenue, t.orb_roas, t.orb_automation, t.orb_scoring, t.orb_conversion];
+
   const sectionRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);

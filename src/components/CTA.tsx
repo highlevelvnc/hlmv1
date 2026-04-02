@@ -3,6 +3,7 @@
 import { useState } from "react";
 import FadeIn from "./FadeIn";
 import Orb from "./Orb";
+import { useT } from "@/i18n/context";
 
 interface FormState  { name: string; email: string; message: string }
 interface FormErrors { name?: string; email?: string; message?: string }
@@ -49,16 +50,12 @@ function Field({
 
 // ─── Success ──────────────────────────────────────────────────────────────────
 
-function SuccessMessage() {
+function SuccessMessage({ text }: { text: string }) {
   return (
     <div className="flex flex-col items-center gap-5 py-10 text-center">
       <div className="h-px w-10 bg-neutral-300" />
-      <p className="text-[15px] font-light leading-[1.85] text-neutral-600">
-        Thank you — we&apos;ll be in touch within 24 hours.
-      </p>
-      <p className="text-[11px] font-light tracking-wide text-neutral-400">
-        contato@highlevelmkt.com
-      </p>
+      <p className="text-[15px] font-light leading-[1.85] text-neutral-600">{text}</p>
+      <p className="text-[11px] font-light tracking-wide text-neutral-400">contato@highlevelmkt.com</p>
     </div>
   );
 }
@@ -66,6 +63,7 @@ function SuccessMessage() {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function CTA() {
+  const t = useT();
   const [form, setForm]               = useState<FormState>({ name: "", email: "", message: "" });
   const [errors, setErrors]           = useState<FormErrors>({});
   const [focused, setFocused]         = useState<string | null>(null);
@@ -80,9 +78,9 @@ export default function CTA() {
 
   const validate = (): FormErrors => {
     const e: FormErrors = {};
-    if (!form.name.trim())                                      e.name    = "Required";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email   = "Valid work email required";
-    if (form.message.trim().length < 5)                         e.message = "Required";
+    if (!form.name.trim())                                      e.name    = t.err_required;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email   = t.err_email;
+    if (form.message.trim().length < 5)                         e.message = t.err_required;
     return e;
   };
 
@@ -122,23 +120,20 @@ export default function CTA() {
           <FadeIn>
             <div className="mb-14 flex items-center gap-6">
               <div className="h-px w-10 bg-neutral-300" />
-              <span className="text-xs font-medium tracking-[0.35em] text-neutral-400">START HERE</span>
+              <span className="text-xs font-medium tracking-[0.35em] text-neutral-400">{t.cta_tag}</span>
               <div className="h-px w-10 bg-neutral-300" />
             </div>
           </FadeIn>
 
           <FadeIn delay={120}>
-            <h2 className="max-w-3xl text-[2.75rem] font-extralight leading-[1.08] tracking-tight text-neutral-900 sm:text-[5rem]">
-              Ready to build your
-              <br />
-              revenue system?
+            <h2 className="max-w-3xl text-[2.75rem] font-extralight leading-[1.08] tracking-tight text-neutral-900 sm:text-[5rem] whitespace-pre-line">
+              {t.cta_headline}
             </h2>
           </FadeIn>
 
           <FadeIn delay={240}>
             <p className="mt-10 max-w-md text-[15px] font-light leading-[1.85] text-neutral-500">
-              We work with a select number of operators each quarter.
-              If you&apos;re serious about growth, let&apos;s talk.
+              {t.cta_body}
             </p>
           </FadeIn>
 
@@ -146,11 +141,11 @@ export default function CTA() {
             <div className="mt-16 w-full max-w-[420px] text-left">
 
               {submitted ? (
-                <SuccessMessage />
+                <SuccessMessage text={t.cta_success} />
               ) : (
                 <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-8">
 
-                  <Field label="Your name" error={errors.name} active={focused === "name"}>
+                  <Field label={t.cta_name} error={errors.name} active={focused === "name"}>
                     <input
                       type="text"
                       value={form.name}
@@ -162,7 +157,7 @@ export default function CTA() {
                     />
                   </Field>
 
-                  <Field label="Work email" error={errors.email} active={focused === "email"}>
+                  <Field label={t.cta_email} error={errors.email} active={focused === "email"}>
                     <input
                       type="email"
                       value={form.email}
@@ -174,7 +169,7 @@ export default function CTA() {
                     />
                   </Field>
 
-                  <Field label="What are you building?" error={errors.message} active={focused === "message"}>
+                  <Field label={t.cta_message} error={errors.message} active={focused === "message"}>
                     <textarea
                       value={form.message}
                       rows={2}
@@ -198,11 +193,11 @@ export default function CTA() {
                         {submitting ? (
                           <>
                             <span className="inline-block h-3 w-3 animate-spin rounded-full border border-white/30 border-t-white/80" />
-                            <span>SENDING</span>
+                            <span>{t.cta_sending}</span>
                           </>
                         ) : (
                           <>
-                            <span>REQUEST A CONVERSATION</span>
+                            <span>{t.cta_submit}</span>
                             <span className="h-px w-5 bg-white/50 transition-all duration-500 group-hover:w-8" />
                           </>
                         )}
@@ -211,7 +206,7 @@ export default function CTA() {
 
                     {serverError && (
                       <p className="mt-4 text-center text-[11px] font-light text-neutral-400">
-                        Something went wrong. Email us at{" "}
+                        {t.cta_error}{" "}
                         <a href="mailto:contato@highlevelmkt.com" className="text-neutral-500 underline underline-offset-2 hover:text-neutral-700">
                           contato@highlevelmkt.com
                         </a>
@@ -220,7 +215,7 @@ export default function CTA() {
                   </div>
 
                   <p className="text-center text-[11px] font-light text-neutral-400">
-                    Or reach us at{" "}
+                    {t.cta_or_email}{" "}
                     <a href="mailto:contato@highlevelmkt.com" className="transition-colors duration-300 hover:text-neutral-600">
                       contato@highlevelmkt.com
                     </a>

@@ -1,14 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-const NAV = [
-  { label: "PROCESS",  href: "#s-scroll-seq" },
-  { label: "SERVICES", href: "#s-value-prop"  },
-  { label: "RESULTS",  href: "#s-proof"       },
-];
+import { useT } from "@/i18n/context";
+import LangSwitcher from "./LangSwitcher";
 
 export default function Header() {
+  const t = useT();
   const [scrolled, setScrolled] = useState(false);
   const [revealed, setRevealed] = useState(false);
 
@@ -21,6 +18,12 @@ export default function Header() {
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const NAV = [
+    { label: t.nav_process,  href: "#s-scroll-seq" },
+    { label: t.nav_services, href: "#s-value-prop"  },
+    { label: t.nav_results,  href: "#s-proof"       },
+  ];
 
   return (
     <header
@@ -37,14 +40,12 @@ export default function Header() {
       }}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        {/* Logo */}
         <a href="/" className="flex-shrink-0" aria-label="HLM home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="HLM" className="mix-blend-multiply"
             style={{ width: 36, height: "auto", opacity: 0.72 }} />
         </a>
 
-        {/* Nav — Dala-style uppercase, wider spacing */}
         <nav className="hidden sm:flex items-center gap-10" aria-label="Main">
           {NAV.map(({ label, href }) => (
             <a key={label} href={href}
@@ -54,11 +55,13 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* CTA — purple like Dala */}
-        <a href="#s-cta"
-          className="rounded-full bg-purple-600 px-6 py-2.5 text-[13px] font-semibold tracking-wide text-white transition-colors duration-300 hover:bg-purple-500">
-          REQUEST A CONVERSATION
-        </a>
+        <div className="flex items-center gap-4">
+          <LangSwitcher />
+          <a href="#s-cta"
+            className="hidden sm:inline-flex rounded-full bg-purple-600 px-6 py-2.5 text-[13px] font-semibold tracking-wide text-white transition-colors duration-300 hover:bg-purple-500">
+            {t.header_cta}
+          </a>
+        </div>
       </div>
     </header>
   );

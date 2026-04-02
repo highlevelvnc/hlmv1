@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { useT } from "@/i18n/context";
 
 const TAU = Math.PI * 2;
 const N_DESK = 40000;
@@ -145,19 +146,7 @@ function latLonTo3D(lat: number, lon: number, r: number): THREE.Vector3 {
   return new THREE.Vector3(r*Math.cos(la)*Math.sin(lo),r*Math.sin(la),-r*Math.cos(la)*Math.cos(lo));
 }
 
-// ─── Text ─────────────────────────────────────────────────────────────────────
-
-const HERO_TITLE = "Revenue systems\nthat run while\nyou sleep.";
-const HERO_SUB = "INTELLIGENT SYSTEMS. REFINED BY DESIGN.";
-const HERO_BODY = "We build automated revenue engines — combining\npaid traffic, automation, and AI to help\noperators grow predictably.";
-
-// 3 shapes × 2 text sections each = 6 text blocks (brain gets 2 with rotation)
-const SECTIONS = [
-  { t: "AI processes\neverything",      s: "Lead scoring, intent mapping,\nand predictive routing." },
-  { t: "Data becomes\nintelligence",    s: "Patterns recognized. Every lead\nrouted with precision." },
-  { t: "Revenue\nwithout borders",      s: "Systems that scale globally.\nBuilt once. Running always." },
-  { t: "Performance\nis the product",   s: "Pipeline generated. ROAS achieved.\nCost per acquisition reduced." },
-];
+// ─── Text is now loaded from i18n — see useSections() inside component ───────
 
 // ─── Shaders ──────────────────────────────────────────────────────────────────
 
@@ -222,10 +211,18 @@ const BG_FRAG = `
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function HeroParticles() {
+  const t = useT();
   const sRef = useRef<HTMLDivElement>(null);
   const cRef = useRef<HTMLCanvasElement>(null);
   const pRef = useRef(0);
   const [prog, setProg] = useState(0);
+
+  const SECTIONS = [
+    { t: t.section_brain1_title, s: t.section_brain1_sub },
+    { t: t.section_brain2_title, s: t.section_brain2_sub },
+    { t: t.section_globe_title,  s: t.section_globe_sub },
+    { t: t.section_dash_title,   s: t.section_dash_sub },
+  ];
 
   useEffect(() => {
     const fn = () => {
@@ -429,7 +426,7 @@ export default function HeroParticles() {
   return (
     <section ref={sRef} aria-label="HLM — Interactive revenue system"
       className="relative" style={{ height: "1000vh", backgroundColor: "#000" }}>
-      <div className="sr-only"><h1>HLM Revenue System</h1></div>
+      <div className="sr-only"><h1>{t.meta_title}</h1></div>
       <div className="sticky top-0 flex w-full items-center overflow-hidden"
         style={{ height: "100svh", minHeight: "100vh" }}>
         <canvas ref={cRef} className="absolute inset-0 h-full w-full" style={{ display: "block" }} />
@@ -438,12 +435,12 @@ export default function HeroParticles() {
         <div className="absolute inset-0 z-10 flex flex-col items-start justify-center px-8 sm:px-12 md:px-20 lg:px-28"
           style={{ opacity: heroOp, transform: `translateY(${heroY}px)`, pointerEvents: heroOp<0.1?"none":"auto" }}>
           <h1 className="text-[2.8rem] sm:text-[4.5rem] md:text-[7rem] lg:text-[7.5rem] font-[400] leading-[1.02] tracking-tight text-white whitespace-pre-line">
-            {HERO_TITLE}
+            {t.hero_title}
           </h1>
-          <p className="mt-8 text-[11px] sm:text-[13px] font-semibold tracking-[0.25em] text-purple-400 uppercase">{HERO_SUB}</p>
-          <p className="mt-5 text-[14px] sm:text-[16px] font-light leading-[1.7] text-white/50 max-w-lg whitespace-pre-line">{HERO_BODY}</p>
+          <p className="mt-8 text-[11px] sm:text-[13px] font-semibold tracking-[0.25em] text-purple-400 uppercase">{t.hero_sub}</p>
+          <p className="mt-5 text-[14px] sm:text-[16px] font-light leading-[1.7] text-white/50 max-w-lg whitespace-pre-line">{t.hero_body}</p>
           <a href="#s-cta" className="mt-10 rounded-full bg-purple-600 px-8 py-3 text-[13px] font-medium tracking-wide text-white transition-colors hover:bg-purple-500">
-            REQUEST A CONVERSATION
+            {t.hero_cta}
           </a>
         </div>
 
@@ -468,7 +465,7 @@ export default function HeroParticles() {
         <div className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2"
           aria-hidden="true" style={{ opacity: Math.max(0,1-prog*6) }}>
           <div className="flex flex-col items-center gap-3">
-            <span className="text-[11px] font-medium tracking-[0.35em] text-white/30">SCROLL TO EXPLORE</span>
+            <span className="text-[11px] font-medium tracking-[0.35em] text-white/30">{t.hero_scroll}</span>
             <div className="h-10 w-px bg-gradient-to-b from-white/20 to-transparent"
               style={{ animation: "scrollPulse 2.5s ease-in-out infinite" }} />
           </div>

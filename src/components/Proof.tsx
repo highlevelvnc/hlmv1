@@ -2,47 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import FadeIn from "./FadeIn";
+import { useT } from "@/i18n/context";
 
-// ─── Static data (outside component for stable format-fn references) ─────────
-
-const METRICS = [
-  {
-    to:      3,
-    format:  (n: number) => `$${Math.round(n)}M+`,
-    label:   "Revenue attributed to HLM systems",
-    primary: true,   // anchor metric — subtly brighter
-  },
-  {
-    to:      4.8,
-    format:  (n: number) => `${n.toFixed(1)}×`,
-    label:   "Average return on ad spend",
-    primary: false,
-  },
-  {
-    to:      50,
-    format:  (n: number) => `${Math.round(n)}+`,
-    label:   "Automated pipelines deployed",
-    primary: false,
-  },
-  {
-    to:      97,
-    format:  (n: number) => `${Math.round(n)}%`,
-    label:   "Client retention over 12 months",
-    primary: false,
-  },
-] as const;
-
-const TESTIMONIALS = [
-  {
-    quote:   "HLM didn't pitch us a media plan. They mapped our entire revenue motion and rebuilt it from scratch. Three months in, our cost per acquisition dropped 40%.",
-    author:  "Founder",
-    company: "B2B SaaS — Series A",
-  },
-  {
-    quote:   "The automation layer alone replaced two full-time SDR positions. The system qualifies, follows up, and books — around the clock.",
-    author:  "Head of Growth",
-    company: "E-commerce",
-  },
+// Format functions stay outside (no translation needed — numbers are universal)
+const METRIC_FORMATS = [
+  { to: 3,   format: (n: number) => `$${Math.round(n)}M+`,    primary: true },
+  { to: 4.8, format: (n: number) => `${n.toFixed(1)}×`,       primary: false },
+  { to: 50,  format: (n: number) => `${Math.round(n)}+`,      primary: false },
+  { to: 97,  format: (n: number) => `${Math.round(n)}%`,      primary: false },
 ] as const;
 
 // ─── Count-up ─────────────────────────────────────────────────────────────────
@@ -101,6 +68,15 @@ function CountUp({
 // ─── Section ──────────────────────────────────────────────────────────────────
 
 export default function Proof() {
+  const t = useT();
+  const METRICS = METRIC_FORMATS.map((m, i) => ({
+    ...m,
+    label: [t.m1_label, t.m2_label, t.m3_label, t.m4_label][i],
+  }));
+  const TESTIMONIALS = [
+    { quote: t.t1_quote, author: t.t1_author, company: t.t1_company },
+    { quote: t.t2_quote, author: t.t2_author, company: t.t2_company },
+  ];
   return (
     <section className="relative w-full overflow-hidden" aria-label="Results and client testimonials">
 
@@ -116,7 +92,7 @@ export default function Proof() {
             <div className="mb-20 flex items-center gap-6">
               <div className="h-px w-10 bg-neutral-700" />
               <span className="text-xs font-medium tracking-[0.35em] text-neutral-500">
-                RESULTS
+                {t.proof_tag}
               </span>
             </div>
           </FadeIn>

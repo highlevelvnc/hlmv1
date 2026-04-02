@@ -55,17 +55,23 @@ export default function ScrollSequence() {
       video.addEventListener("loadedmetadata", unlock, { once: true });
     }
 
-    // Lerp-based smooth seeking
+    // Smooth seeking — slow lerp + minimum seek threshold to prevent stutter
     let currentTime = 0;
+    let lastSeekTime = 0;
     let rafId: number;
 
     const animate = () => {
       if (video.duration && targetTimeRef.current >= 0) {
-        currentTime += (targetTimeRef.current - currentTime) * 0.12;
+        // Very gentle lerp — prevents rapid frame-by-frame seeking
+        currentTime += (targetTimeRef.current - currentTime) * 0.04;
 
-        if (Math.abs(currentTime - targetTimeRef.current) > 0.001) {
+        const delta = Math.abs(currentTime - lastSeekTime);
+        // Only seek if delta is large enough (prevents micro-stutters)
+        // AND enough time has passed since last seek (throttle to ~20fps max)
+        if (delta > 0.03) {
           try {
             video.currentTime = currentTime;
+            lastSeekTime = currentTime;
           } catch {
             // ignore
           }
@@ -132,7 +138,7 @@ export default function ScrollSequence() {
       ref={sectionRef}
       aria-label="How the revenue system works"
       className="relative bg-white"
-      style={{ height: "450vh" }}
+      style={{ height: "650vh" }}
     >
       {/* Sticky viewport container */}
       <div

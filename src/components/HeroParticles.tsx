@@ -7,7 +7,7 @@ const TAU = Math.PI * 2;
 const N_DESK = 40000;
 const N_MOB  = 18000;
 const N_BG   = 350;
-const BG     = 0x000000; // pure black like Dala
+const BG     = 0x000000;
 
 function ss(lo: number, hi: number, x: number) {
   const t = Math.max(0, Math.min(1, (x - lo) / (hi - lo)));
@@ -21,137 +21,43 @@ const PAL = [
   [0.72, 0.48, 0.98], [0.98, 0.58, 0.20],
 ];
 
-// ─── Shapes ───────────────────────────────────────────────────────────────────
-
-function shapeFunnel(N: number): Float32Array {
-  const p = new Float32Array(N * 3);
-  for (let i = 0; i < N; i++) {
-    const t = Math.random();
-    const r = 4.5 - 3.9 * Math.pow(t, 0.65);
-    const a = Math.random() * TAU;
-    const sh = 0.94 + Math.random() * 0.06;
-    p[i*3]=Math.cos(a)*r*sh; p[i*3+1]=4.2-t*8.4; p[i*3+2]=Math.sin(a)*r*sh;
-  }
-  return p;
-}
+// ─── Shape 1: Brain ───────────────────────────────────────────────────────────
 
 function shapeBrain(N: number): Float32Array {
   const p = new Float32Array(N * 3);
   const ga = Math.PI * (3 - Math.sqrt(5));
   for (let i = 0; i < N; i++) {
     const phi = Math.acos(1 - 2*(i+0.5)/N), th = ga * i;
-    // Lateral view brain — viewed from the side
     const sinP = Math.sin(phi), cosP = Math.cos(phi);
     const sinT = Math.sin(th), cosT = Math.cos(th);
     let r = 3.8;
-    // Frontal lobe — rounded front bulge
-    const frontal = Math.max(0, cosT) * Math.pow(sinP, 2) * 0.6;
-    // Occipital lobe — rear bump
-    const occipital = Math.max(0, -cosT) * Math.pow(sinP, 2) * 0.35;
-    // Temporal lobes — side bulges at mid-height
-    const temporal = Math.pow(Math.max(0, sinP * 0.9 - Math.abs(cosP) * 0.3), 2) * Math.abs(sinT) * 0.5;
-    // Cerebellum — smaller bulge at back-bottom
-    const cerebellum = Math.max(0, -cosT * 0.8 + cosP * 0.6 - 0.4) * 1.2;
-    // Brain stem — thin extension downward at back
-    const stem = Math.max(0, cosP - 0.7) * Math.max(0, -cosT) * 2.5;
-    // Deep sulci (brain folds) — multiple frequencies
-    const sulci = 0.45 * Math.sin(phi*4.5) * Math.cos(th*3.2)
-                + 0.25 * Math.sin(phi*8.0 + th*4.5)
-                + 0.12 * Math.cos(phi*12.0 - th*7.0)
-                + 0.06 * Math.sin(phi*18.0 + th*11.0);
-    // Central fissure — deep groove at top dividing hemispheres
-    const fissure = Math.pow(Math.max(0, -cosP), 5) * Math.pow(Math.abs(sinT), 0.3) * 1.0;
-    // Lateral fissure (Sylvian)
-    const sylvian = Math.max(0, sinP - 0.3) * Math.pow(Math.max(0, Math.sin(th - 0.8)), 3) * 0.4;
-
-    r += frontal + occipital + temporal + cerebellum + stem + sulci - fissure - sylvian;
-    r = Math.max(r, 0.3); // prevent negative radius
-    const d = 0.94 + Math.random() * 0.06;
-    r *= d;
-    // Brain is wider than tall, slightly elongated front-to-back
-    p[i*3]   = r * sinP * cosT * 1.15; // X: left-right (wider)
-    p[i*3+1] = r * cosP * 0.82;        // Y: top-bottom (shorter)
-    p[i*3+2] = r * sinP * sinT * 1.05;  // Z: front-back
+    r += Math.max(0, cosT) * Math.pow(sinP, 2) * 0.6;
+    r += Math.max(0, -cosT) * Math.pow(sinP, 2) * 0.35;
+    r += Math.pow(Math.max(0, sinP*0.9 - Math.abs(cosP)*0.3), 2) * Math.abs(sinT) * 0.5;
+    r += Math.max(0, -cosT*0.8 + cosP*0.6 - 0.4) * 1.2;
+    r += Math.max(0, cosP - 0.7) * Math.max(0, -cosT) * 2.5;
+    r += 0.45*Math.sin(phi*4.5)*Math.cos(th*3.2) + 0.25*Math.sin(phi*8+th*4.5) + 0.12*Math.cos(phi*12-th*7) + 0.06*Math.sin(phi*18+th*11);
+    r -= Math.pow(Math.max(0,-cosP),5)*Math.pow(Math.abs(sinT),0.3)*1.0;
+    r -= Math.max(0,sinP-0.3)*Math.pow(Math.max(0,Math.sin(th-0.8)),3)*0.4;
+    r = Math.max(r, 0.3);
+    r *= 0.94 + Math.random()*0.06;
+    p[i*3] = r*sinP*cosT*1.15; p[i*3+1] = r*cosP*0.82; p[i*3+2] = r*sinP*sinT*1.05;
   }
   return p;
 }
 
-function shapeLightbulb(N: number): Float32Array {
-  const p = new Float32Array(N * 3);
-  for (let i = 0; i < N; i++) {
-    const t = Math.random();
-    const th = Math.random() * TAU;
-    const d = 0.95 + Math.random() * 0.05;
-    if (t < 0.40) {
-      // Glass bulb — full sphere top, A19 bulb profile
-      const phi = Math.acos(Math.random()); // upper hemisphere
-      const r = 3.5 * d;
-      p[i*3]=r*Math.sin(phi)*Math.cos(th); p[i*3+1]=r*Math.cos(phi)+1.0; p[i*3+2]=r*Math.sin(phi)*Math.sin(th);
-    } else if (t < 0.58) {
-      // Bulb lower taper — smooth pear shape transition
-      const h = Math.random(); // 0=equator, 1=neck
-      // Pear profile: starts at full radius, curves inward following real bulb shape
-      const profile = Math.cos(h * Math.PI * 0.5); // cosine taper
-      const r = 3.5 * profile * d;
-      p[i*3]=Math.cos(th)*r; p[i*3+1]=-h*3.0+1.0; p[i*3+2]=Math.sin(th)*r;
-    } else if (t < 0.72) {
-      // Neck — narrow cylinder connecting bulb to base
-      const h = Math.random() * 1.2;
-      const r = (0.9 + Math.sin(h*3)*0.05) * d;
-      p[i*3]=Math.cos(th)*r; p[i*3+1]=-2.0-h; p[i*3+2]=Math.sin(th)*r;
-    } else if (t < 0.88) {
-      // Edison screw base — wider with visible thread ridges
-      const h = Math.random() * 2.5;
-      const baseR = 1.15 - h*0.08;
-      // Screw thread — pronounced sine ridges
-      const thread = Math.sin(h * 16) * 0.15;
-      const r = (baseR + thread) * d;
-      p[i*3]=Math.cos(th)*r; p[i*3+1]=-3.2-h; p[i*3+2]=Math.sin(th)*r;
-    } else if (t < 0.94) {
-      // Base contact — flat disc at bottom
-      const r = Math.random() * 0.7 * d;
-      p[i*3]=Math.cos(th)*r; p[i*3+1]=-5.7; p[i*3+2]=Math.sin(th)*r;
-    } else {
-      // Filament — glowing coil inside the bulb
-      const h = Math.random() * 2.0;
-      const coilR = 0.3 + Math.sin(h*8)*0.15;
-      p[i*3]=Math.cos(th+h*6)*coilR; p[i*3+1]=0.5+h; p[i*3+2]=Math.sin(th+h*6)*coilR;
-    }
-  }
-  return p;
-}
+// ─── Shape 2: Globe with real continents ──────────────────────────────────────
 
-// Simplified continent boundaries — checks if lat/lon (radians) is over land
 function isLand(latR: number, lonR: number): boolean {
-  const lat = latR * 180 / Math.PI; // degrees
-  const lon = lonR * 180 / Math.PI;
-  // North America
-  if (lat>25&&lat<72&&lon>-170&&lon<-50) {
-    if (lat>48&&lon<-55) return true; // Canada
-    if (lat>25&&lat<50&&lon>-130&&lon<-65) return true; // USA
-    if (lat>15&&lat<32&&lon>-120&&lon<-85) return true; // Mexico
-    return false;
-  }
-  // South America
-  if (lat>-58&&lat<15&&lon>-82&&lon<-34) {
-    if (lon>-75&&lon<-35&&lat>-55&&lat<10) return true;
-    return false;
-  }
-  // Europe
+  const lat = latR*180/Math.PI, lon = lonR*180/Math.PI;
+  if (lat>25&&lat<72&&lon>-170&&lon<-50) { if (lat>48&&lon<-55) return true; if (lat>25&&lat<50&&lon>-130&&lon<-65) return true; if (lat>15&&lat<32&&lon>-120&&lon<-85) return true; return false; }
+  if (lat>-58&&lat<15&&lon>-82&&lon<-34) { if (lon>-75&&lon<-35&&lat>-55&&lat<10) return true; return false; }
   if (lat>35&&lat<72&&lon>-12&&lon<45) return true;
-  // Africa
-  if (lat>-36&&lat<38&&lon>-18&&lon<52) {
-    if (lat>0&&lon>42) return false; // Arabian sea
-    return true;
-  }
-  // Asia
+  if (lat>-36&&lat<38&&lon>-18&&lon<52) { if (lat>0&&lon>42) return false; return true; }
   if (lat>10&&lat<75&&lon>45&&lon<180) return true;
-  if (lat>-10&&lat<10&&lon>95&&lon<140) return true; // SE Asia islands
-  // Australia
+  if (lat>-10&&lat<10&&lon>95&&lon<140) return true;
   if (lat>-45&&lat<-10&&lon>112&&lon<155) return true;
-  // Greenland
   if (lat>60&&lat<84&&lon>-55&&lon<-15) return true;
-  // Antarctica
   if (lat<-65) return true;
   return false;
 }
@@ -159,21 +65,70 @@ function isLand(latR: number, lonR: number): boolean {
 function shapeGlobe(N: number): Float32Array {
   const p = new Float32Array(N * 3); let idx = 0;
   while (idx < N) {
-    const phi = Math.acos(2*Math.random()-1), th = Math.random()*TAU;
-    const lat = Math.PI/2 - phi;  // -π/2 to π/2
-    const lon = th - Math.PI;     // -π to π
+    const phi=Math.acos(2*Math.random()-1), th=Math.random()*TAU;
+    const lat=Math.PI/2-phi, lon=th-Math.PI;
     const land = isLand(lat, lon);
-    // Land: on surface. Ocean: slightly inward + sparser
     const r = land ? 4.2*(0.97+Math.random()*0.03) : 4.2*(0.88+Math.random()*0.06);
-    // Skip 55% of ocean particles — creates visible continent outlines
     if (!land && Math.random() < 0.55) continue;
     p[idx*3]=r*Math.sin(phi)*Math.cos(th); p[idx*3+1]=r*Math.cos(phi); p[idx*3+2]=r*Math.sin(phi)*Math.sin(th);
-    idx++; if (idx >= N) break;
+    idx++; if (idx>=N) break;
   }
   return p;
 }
 
-// All particles start at origin (invisible) — they explode outward on first scroll
+// ─── Shape 3: Dashboard / KPI bars ────────────────────────────────────────────
+// 7 vertical bars of different heights + a horizontal baseline + floating data points
+
+function shapeDashboard(N: number): Float32Array {
+  const p = new Float32Array(N * 3);
+  // 7 bars with different heights (KPI columns)
+  const bars = [
+    { x: -4.5, h: 5.5, w: 0.9 },  // bar 1
+    { x: -3.0, h: 3.8, w: 0.9 },  // bar 2
+    { x: -1.5, h: 6.2, w: 0.9 },  // bar 3 (tallest)
+    { x:  0.0, h: 4.5, w: 0.9 },  // bar 4
+    { x:  1.5, h: 7.0, w: 0.9 },  // bar 5 (tallest — the "hero" metric)
+    { x:  3.0, h: 5.0, w: 0.9 },  // bar 6
+    { x:  4.5, h: 3.2, w: 0.9 },  // bar 7
+  ];
+  const totalBars = bars.length;
+
+  for (let i = 0; i < N; i++) {
+    const t = Math.random();
+    if (t < 0.70) {
+      // Bar particles — distributed across the 7 bars
+      const barIdx = Math.floor(Math.random() * totalBars);
+      const bar = bars[barIdx];
+      const y = -3.5 + Math.random() * bar.h; // bottom at -3.5, height varies
+      const xOff = (Math.random() - 0.5) * bar.w;
+      const zOff = (Math.random() - 0.5) * bar.w;
+      p[i*3] = bar.x + xOff;
+      p[i*3+1] = y;
+      p[i*3+2] = zOff;
+    } else if (t < 0.82) {
+      // Baseline / grid lines (horizontal plane at bottom)
+      const x = (Math.random() - 0.5) * 12;
+      const z = (Math.random() - 0.5) * 3;
+      p[i*3] = x; p[i*3+1] = -3.5 + (Math.random()-0.5)*0.15; p[i*3+2] = z;
+    } else if (t < 0.92) {
+      // Trend line — ascending curve across the bars
+      const x = (Math.random() - 0.5) * 11;
+      const trendY = -1.5 + Math.pow((x + 5.5) / 11, 1.3) * 5; // ascending curve
+      const scatter = (Math.random()-0.5) * 0.4;
+      p[i*3] = x; p[i*3+1] = trendY + scatter; p[i*3+2] = (Math.random()-0.5)*0.5;
+    } else {
+      // Floating data nodes around the chart (like dashboard widgets)
+      const angle = Math.random() * TAU;
+      const r = 5.5 + Math.random() * 2;
+      const y = (Math.random() - 0.5) * 6;
+      p[i*3] = Math.cos(angle)*r*0.8; p[i*3+1] = y; p[i*3+2] = Math.sin(angle)*r*0.4;
+    }
+  }
+  return p;
+}
+
+// ─── Origin + scatter ─────────────────────────────────────────────────────────
+
 function shapeOrigin(N: number): Float32Array { return new Float32Array(N * 3); }
 
 function makeScatter(N: number): Float32Array {
@@ -190,18 +145,18 @@ function latLonTo3D(lat: number, lon: number, r: number): THREE.Vector3 {
   return new THREE.Vector3(r*Math.cos(la)*Math.sin(lo),r*Math.sin(la),-r*Math.cos(la)*Math.cos(lo));
 }
 
-// ─── Text — Dala style: hero heading first, then sections ─────────────────────
+// ─── Text ─────────────────────────────────────────────────────────────────────
 
 const HERO_TITLE = "Revenue systems\nthat run while\nyou sleep.";
 const HERO_SUB = "INTELLIGENT SYSTEMS. REFINED BY DESIGN.";
 const HERO_BODY = "We build automated revenue engines — combining\npaid traffic, automation, and AI to help\noperators grow predictably.";
 
+// 3 shapes × 2 text sections each = 6 text blocks (brain gets 2 with rotation)
 const SECTIONS = [
-  { t: "We capture\nevery signal",  s: "10,000+ touchpoints tracked.\nEvery channel optimized." },
-  { t: "AI processes\neverything",   s: "Lead scoring, intent mapping,\nand predictive routing." },
-  { t: "Data becomes\nintelligence", s: "Patterns recognized. Every lead\nrouted with precision." },
-  { t: "Insights\nthat convert",    s: "From data to decisions.\nAutomated sequences that close." },
-  { t: "Revenue\nwithout borders",  s: "Systems that scale globally.\nBuilt once. Running always." },
+  { t: "AI processes\neverything",      s: "Lead scoring, intent mapping,\nand predictive routing." },
+  { t: "Data becomes\nintelligence",    s: "Patterns recognized. Every lead\nrouted with precision." },
+  { t: "Revenue\nwithout borders",      s: "Systems that scale globally.\nBuilt once. Running always." },
+  { t: "Performance\nis the product",   s: "Pipeline generated. ROAS achieved.\nCost per acquisition reduced." },
 ];
 
 // ─── Shaders ──────────────────────────────────────────────────────────────────
@@ -291,33 +246,26 @@ export default function HeroParticles() {
     const mob = window.innerWidth < 768;
     const N = mob ? N_MOB : N_DESK;
 
-    // Shapes: origin (invisible) → funnel → brain → lightbulb → globe
-    const shapes = [shapeOrigin(N), shapeFunnel(N), shapeBrain(N), shapeLightbulb(N), shapeGlobe(N)];
+    // 3 shapes only: origin → brain → globe → dashboard
+    const shapes = [shapeOrigin(N), shapeBrain(N), shapeGlobe(N), shapeDashboard(N)];
     const scatter = makeScatter(N);
 
     const scene = new THREE.Scene();
     const cam = new THREE.PerspectiveCamera(45, 1, 0.1, 200);
     cam.position.set(mob ? 0 : 2, 0, 11);
-
     const ren = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     ren.setClearColor(BG, 1);
     ren.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const geo = new THREE.BufferGeometry();
-    const pos = new Float32Array(N*3);
-    const col = new Float32Array(N*3);
-    const siz = new Float32Array(N);
-    const rot = new Float32Array(N);
-
+    const pos = new Float32Array(N*3), col = new Float32Array(N*3), siz = new Float32Array(N), rot = new Float32Array(N);
     for (let i = 0; i < N; i++) {
       const c = PAL[Math.floor(Math.random()*PAL.length)];
       col[i*3]=c[0]; col[i*3+1]=c[1]; col[i*3+2]=c[2];
-      // Dala-level sizes: lots of medium + many large visible triangles
       const r = Math.random();
       siz[i] = r<0.40 ? 0.08+Math.random()*0.18 : r<0.75 ? 0.28+Math.random()*0.55 : 0.70+Math.random()*0.90;
       rot[i] = Math.random()*TAU;
     }
-
     geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
     geo.setAttribute("aSize", new THREE.BufferAttribute(siz, 1));
@@ -350,10 +298,9 @@ export default function HeroParticles() {
       vertexShader:BG_VERT, fragmentShader:BG_FRAG,
       transparent:true, vertexColors:true, depthWrite:false, depthTest:true, blending:THREE.AdditiveBlending,
     });
-    const bgPts = new THREE.Points(bgGeo, bgMat);
-    scene.add(bgPts);
+    scene.add(new THREE.Points(bgGeo, bgMat));
 
-    // Pin
+    // Pin (globe)
     const pinGroup = new THREE.Group(); pinGroup.visible = false; scene.add(pinGroup);
     const pinDot=new THREE.Mesh(new THREE.SphereGeometry(0.18,12,12),new THREE.MeshBasicMaterial({color:0x44ff88}));
     pinGroup.add(pinDot);
@@ -366,7 +313,7 @@ export default function HeroParticles() {
 
     const mouse={x:0.5,y:0.5},sm={x:0.5,y:0.5};
     const rc=new THREE.Raycaster(),mNDC=new THREE.Vector2(),m3D=new THREE.Vector3(100,100,0);
-    let raf=0,vis=true,brainRotOff=0,time=0;
+    let raf=0,vis=true,time=0;
 
     function onR() {
       const r=canvas.parentElement?.getBoundingClientRect(); if(!r) return;
@@ -377,17 +324,15 @@ export default function HeroParticles() {
     function onT(e:TouchEvent){const t=e.touches[0];if(!t)return;mouse.x=t.clientX/window.innerWidth;mouse.y=t.clientY/window.innerHeight;const r=canvas.getBoundingClientRect();mNDC.x=((t.clientX-r.left)/r.width)*2-1;mNDC.y=-((t.clientY-r.top)/r.height)*2+1;}
 
     /*
-      SCROLL TIMELINE (1000vh = 900vh travel, much slower):
-      0.00-0.06: Hero text only
-      0.06-0.12: Explode origin → funnel
-      0.12-0.22: FUNNEL stable
-      0.22-0.28: Explode funnel → brain
-      0.28-0.46: BRAIN (long hold, 2 texts, rotates 120°)
-      0.46-0.52: Explode brain → lightbulb
-      0.52-0.64: LIGHTBULB stable
-      0.64-0.70: Explode lightbulb → globe
-      0.70-0.86: GLOBE stable
-      0.86-1.00: Fade out
+      TIMELINE (1000vh, 3 shapes):
+      0.00-0.06: Hero text
+      0.06-0.14: Explode origin → brain
+      0.14-0.38: BRAIN (2 texts, 360° rotation)
+      0.38-0.46: Explode brain → globe
+      0.46-0.64: GLOBE
+      0.64-0.72: Explode globe → dashboard
+      0.72-0.88: DASHBOARD
+      0.88-1.00: Fade
     */
 
     function animate() {
@@ -398,14 +343,12 @@ export default function HeroParticles() {
 
       let shA=0,shB=0,lT=0,isTr=false;
       if (p<0.06)      { shA=0;shB=0;lT=0; }
-      else if (p<0.12) { shA=0;shB=1;lT=ss(0.06,0.12,p);isTr=true; }
-      else if (p<0.22) { shA=1;shB=1;lT=0; }
-      else if (p<0.28) { shA=1;shB=2;lT=ss(0.22,0.28,p);isTr=true; }
-      else if (p<0.46) { shA=2;shB=2;lT=0; }
-      else if (p<0.52) { shA=2;shB=3;lT=ss(0.46,0.52,p);isTr=true; }
-      else if (p<0.64) { shA=3;shB=3;lT=0; }
-      else if (p<0.70) { shA=3;shB=4;lT=ss(0.64,0.70,p);isTr=true; }
-      else             { shA=4;shB=4;lT=0; }
+      else if (p<0.14) { shA=0;shB=1;lT=ss(0.06,0.14,p);isTr=true; }
+      else if (p<0.38) { shA=1;shB=1;lT=0; }
+      else if (p<0.46) { shA=1;shB=2;lT=ss(0.38,0.46,p);isTr=true; }
+      else if (p<0.64) { shA=2;shB=2;lT=0; }
+      else if (p<0.72) { shA=2;shB=3;lT=ss(0.64,0.72,p);isTr=true; }
+      else             { shA=3;shB=3;lT=0; }
 
       const from=shapes[shA],to=shapes[shB];
       const explode=isTr?Math.sin(lT*Math.PI):0;
@@ -418,32 +361,38 @@ export default function HeroParticles() {
       m3D.applyMatrix4(pts.matrixWorld.clone().invert());
       mat.uniforms.uMouse.value.copy(m3D);
 
-      // Very slow rotation like Dala
+      // Rotation
       const tRY=(sm.x-0.5)*0.3,tRX=(sm.y-0.5)*-0.2;
-      pts.rotation.y+=(tRY-pts.rotation.y)*0.02;
-      pts.rotation.x+=(tRX-pts.rotation.x)*0.02;
-      pts.rotation.y+=0.0003;
 
-      // Brain: exactly ONE full 360° rotation over its scroll range
-      if(p>=0.28&&p<=0.46) brainRotOff=((p-0.28)/0.18)*TAU; // 0 → 2π (one full turn)
-      else if(p<0.28) brainRotOff=0;
-      else brainRotOff=TAU; // stay at final angle after brain section
-      if(shA===2&&!isTr) pts.rotation.y=brainRotOff+(sm.x-0.5)*0.3; // SET not ADD — prevents accumulation
+      if (shA===1 && !isTr) {
+        // Brain: exactly ONE full 360° rotation, SET not ADD
+        const brainT = c01((p-0.14)/0.24); // 0→1 over brain section
+        pts.rotation.y = brainT * TAU + (sm.x-0.5)*0.3;
+        pts.rotation.x = tRX;
+      } else if (shA===3 && !isTr) {
+        // Dashboard: slight tilt, minimal rotation
+        pts.rotation.y += (tRY*0.3 - pts.rotation.y)*0.02;
+        pts.rotation.x += (tRX*0.5 - pts.rotation.x)*0.02;
+      } else {
+        // Default: slow auto-spin + cursor
+        pts.rotation.y += (tRY - pts.rotation.y)*0.02;
+        pts.rotation.x += (tRX - pts.rotation.x)*0.02;
+        pts.rotation.y += 0.0003;
+      }
 
-      bgPts.rotation.y=time*0.02; bgPts.rotation.x=Math.sin(time*0.2)*0.02;
       bgMat.uniforms.uTime.value=time;
 
       cam.position.x=(mob?0:2)+(sm.x-0.5)*1.0;
       cam.position.y=(sm.y-0.5)*-0.6;
       cam.lookAt(mob?0:0.8,0,0);
 
-      // Pin on globe
-      if(pinReady&&shA===4&&!isTr){
+      // Pin on globe (shape index 2)
+      if(pinReady&&shA===2&&!isTr){
         pinGroup.visible=true;pinGroup.position.copy(pinPos);pinGroup.lookAt(0,0,0);pinGroup.rotateX(Math.PI/2);pinGroup.position.applyEuler(pts.rotation);
         const pulse=1+Math.sin(Date.now()*0.004)*0.2;pinRingMat.opacity=0.3+Math.sin(Date.now()*0.003)*0.2;pinDot.scale.setScalar(pulse);pinRing.scale.setScalar(pulse*1.3);
       } else { pinGroup.visible=false; }
 
-      const fade=p>0.86?1-ss(0.86,1.0,p):1;
+      const fade=p>0.88?1-ss(0.88,1.0,p):1;
       mat.uniforms.uScale.value=fade;
       ren.render(scene,cam);
     }
@@ -457,13 +406,12 @@ export default function HeroParticles() {
     return()=>{cancelAnimationFrame(raf);obs.disconnect();window.removeEventListener("resize",onR);window.removeEventListener("mousemove",onM);window.removeEventListener("touchmove",onT);ren.dispose();geo.dispose();mat.dispose();bgGeo.dispose();bgMat.dispose();};
   }, []);
 
-  // ── Text ranges for vertical slide ──────────────────────────────────────────
+  // ── Text: 4 sections (brain×2, globe, dashboard) ───────────────────────────
   const RANGES: [number,number][] = [
-    [0.12, 0.25], // funnel
-    [0.28, 0.38], // brain 1
-    [0.38, 0.48], // brain 2
-    [0.52, 0.66], // lightbulb
-    [0.70, 0.86], // globe
+    [0.14, 0.28], // brain 1
+    [0.28, 0.40], // brain 2
+    [0.46, 0.66], // globe
+    [0.72, 0.88], // dashboard
   ];
 
   function txStyle(i: number) {
@@ -474,62 +422,35 @@ export default function HeroParticles() {
     return { opacity:op, transform:`translateY(${si+so}px)` };
   }
 
-  // Hero heading fades out as particles appear
   const heroOp = 1 - ss(0.03, 0.10, prog);
   const heroY = ss(0.02, 0.10, prog) * -80;
   const exit = ss(0.88, 1.0, prog);
 
   return (
-    <section ref={sRef} aria-label="HLM — Interactive revenue funnel"
+    <section ref={sRef} aria-label="HLM — Interactive revenue system"
       className="relative" style={{ height: "1000vh", backgroundColor: "#000" }}>
       <div className="sr-only"><h1>HLM Revenue System</h1></div>
       <div className="sticky top-0 flex w-full items-center overflow-hidden"
         style={{ height: "100svh", minHeight: "100vh" }}>
         <canvas ref={cRef} className="absolute inset-0 h-full w-full" style={{ display: "block" }} />
 
-        {/* HERO — large centered text, like Dala's first view. Fades as particles appear */}
+        {/* Hero text */}
         <div className="absolute inset-0 z-10 flex flex-col items-start justify-center px-8 sm:px-12 md:px-20 lg:px-28"
-          style={{ opacity: heroOp, transform: `translateY(${heroY}px)`, pointerEvents: heroOp < 0.1 ? "none" : "auto" }}>
+          style={{ opacity: heroOp, transform: `translateY(${heroY}px)`, pointerEvents: heroOp<0.1?"none":"auto" }}>
           <h1 className="text-[2.8rem] sm:text-[4.5rem] md:text-[7rem] lg:text-[7.5rem] font-[400] leading-[1.02] tracking-tight text-white whitespace-pre-line">
             {HERO_TITLE}
           </h1>
-          <p className="mt-8 text-[11px] sm:text-[13px] font-semibold tracking-[0.25em] text-purple-400 uppercase">
-            {HERO_SUB}
-          </p>
-          <p className="mt-5 text-[14px] sm:text-[16px] font-light leading-[1.7] text-white/50 max-w-lg whitespace-pre-line">
-            {HERO_BODY}
-          </p>
+          <p className="mt-8 text-[11px] sm:text-[13px] font-semibold tracking-[0.25em] text-purple-400 uppercase">{HERO_SUB}</p>
+          <p className="mt-5 text-[14px] sm:text-[16px] font-light leading-[1.7] text-white/50 max-w-lg whitespace-pre-line">{HERO_BODY}</p>
           <a href="#s-cta" className="mt-10 rounded-full bg-purple-600 px-8 py-3 text-[13px] font-medium tracking-wide text-white transition-colors hover:bg-purple-500">
             REQUEST A CONVERSATION
           </a>
         </div>
 
-        {/* Funnel hover leads — floating labels showing leads entering */}
-        {prog > 0.10 && prog < 0.25 && (
-          <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden" aria-hidden="true">
-            {["João Silva — Lead Qualificado", "Maria Santos — Demo Agendada", "Tech Corp — Proposta Enviada",
-              "Growth Ltd — Reunião Marcada", "Ana Costa — Formulário Preenchido", "Pedro Lima — Retargeting Ativo",
-              "StartupXYZ — Interesse Alto", "Carlos Faria — MQL Confirmado"
-            ].map((label, i) => {
-              const x = 25 + Math.sin(i * 1.7 + prog * 20) * 25;
-              const y = 10 + (i * 11 + prog * 300 + i * 50) % 85;
-              const op = 0.15 + Math.sin(i * 2.3 + prog * 15) * 0.15;
-              return (
-                <div key={i} className="absolute text-[10px] sm:text-[11px] font-light text-purple-300/60 whitespace-nowrap"
-                  style={{ left: `${x}%`, top: `${y}%`, opacity: op, transition: "none" }}>
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400/50 mr-2 align-middle" />
-                  {label}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Section texts — alternate left/right like Dala */}
+        {/* Section texts — alternate left/right */}
         <div className="absolute inset-0 z-10 flex items-center pointer-events-none">
           {SECTIONS.map((tx, i) => {
-            // Alternate sides: 0=left, 1=right, 2=right, 3=left, 4=right
-            const isRight = i === 1 || i === 2 || i === 4;
+            const isRight = i === 0 || i === 3; // brain1=right, brain2=left(implicit), globe=left, dashboard=right
             return (
               <div key={i} className={`absolute top-1/2 -translate-y-1/2 flex flex-col gap-4 max-w-lg ${isRight ? "right-8 sm:right-12 md:right-20 lg:right-28 text-right items-end" : "left-8 sm:left-12 md:left-20 lg:left-28 text-left items-start"}`}
                 style={{ ...txStyle(i), transition: "none" }}>

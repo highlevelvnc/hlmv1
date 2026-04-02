@@ -40,15 +40,38 @@ function shapeBrain(N: number): Float32Array {
   const ga = Math.PI * (3 - Math.sqrt(5));
   for (let i = 0; i < N; i++) {
     const phi = Math.acos(1 - 2*(i+0.5)/N), th = ga * i;
-    let r = 4.0;
-    r += 0.55*Math.sin(phi*3.2)*Math.cos(th*2.8);
-    r += 0.30*Math.sin(phi*6.5+th*3.5);
-    r += 0.15*Math.cos(phi*9.2-th*5.1);
-    r += 0.08*Math.sin(phi*14+th*8);
-    r -= Math.pow(Math.max(0,Math.cos(phi)),4)*Math.pow(Math.abs(Math.sin(th)),0.5)*0.8;
-    r += Math.max(0,Math.sin(phi-2.2))*Math.max(0,-Math.cos(th))*0.4;
-    r *= 0.93+Math.random()*0.07;
-    p[i*3]=r*Math.sin(phi)*Math.cos(th)*1.22; p[i*3+1]=r*Math.cos(phi)*0.85; p[i*3+2]=r*Math.sin(phi)*Math.sin(th);
+    // Lateral view brain — viewed from the side
+    const sinP = Math.sin(phi), cosP = Math.cos(phi);
+    const sinT = Math.sin(th), cosT = Math.cos(th);
+    let r = 3.8;
+    // Frontal lobe — rounded front bulge
+    const frontal = Math.max(0, cosT) * Math.pow(sinP, 2) * 0.6;
+    // Occipital lobe — rear bump
+    const occipital = Math.max(0, -cosT) * Math.pow(sinP, 2) * 0.35;
+    // Temporal lobes — side bulges at mid-height
+    const temporal = Math.pow(Math.max(0, sinP * 0.9 - Math.abs(cosP) * 0.3), 2) * Math.abs(sinT) * 0.5;
+    // Cerebellum — smaller bulge at back-bottom
+    const cerebellum = Math.max(0, -cosT * 0.8 + cosP * 0.6 - 0.4) * 1.2;
+    // Brain stem — thin extension downward at back
+    const stem = Math.max(0, cosP - 0.7) * Math.max(0, -cosT) * 2.5;
+    // Deep sulci (brain folds) — multiple frequencies
+    const sulci = 0.45 * Math.sin(phi*4.5) * Math.cos(th*3.2)
+                + 0.25 * Math.sin(phi*8.0 + th*4.5)
+                + 0.12 * Math.cos(phi*12.0 - th*7.0)
+                + 0.06 * Math.sin(phi*18.0 + th*11.0);
+    // Central fissure — deep groove at top dividing hemispheres
+    const fissure = Math.pow(Math.max(0, -cosP), 5) * Math.pow(Math.abs(sinT), 0.3) * 1.0;
+    // Lateral fissure (Sylvian)
+    const sylvian = Math.max(0, sinP - 0.3) * Math.pow(Math.max(0, Math.sin(th - 0.8)), 3) * 0.4;
+
+    r += frontal + occipital + temporal + cerebellum + stem + sulci - fissure - sylvian;
+    r = Math.max(r, 0.3); // prevent negative radius
+    const d = 0.94 + Math.random() * 0.06;
+    r *= d;
+    // Brain is wider than tall, slightly elongated front-to-back
+    p[i*3]   = r * sinP * cosT * 1.15; // X: left-right (wider)
+    p[i*3+1] = r * cosP * 0.82;        // Y: top-bottom (shorter)
+    p[i*3+2] = r * sinP * sinT * 1.05;  // Z: front-back
   }
   return p;
 }
@@ -57,28 +80,95 @@ function shapeLightbulb(N: number): Float32Array {
   const p = new Float32Array(N * 3);
   for (let i = 0; i < N; i++) {
     const t = Math.random();
-    if (t<0.50) { const phi=Math.acos(Math.random()),th=Math.random()*TAU,r=3.6*(0.94+Math.random()*0.06); p[i*3]=r*Math.sin(phi)*Math.cos(th); p[i*3+1]=r*Math.cos(phi)+0.8; p[i*3+2]=r*Math.sin(phi)*Math.sin(th); }
-    else if (t<0.72) { const h=Math.random(),th=Math.random()*TAU,r=3.6*(1-h*0.68)*(0.94+Math.random()*0.06); p[i*3]=Math.cos(th)*r; p[i*3+1]=-h*2.8+0.8; p[i*3+2]=Math.sin(th)*r; }
-    else if (t<0.90) { const th=Math.random()*TAU,h=Math.random()*3.2,br=1.1-h*0.12+Math.sin(h*14)*0.10; p[i*3]=Math.cos(th)*br; p[i*3+1]=-2.0-h; p[i*3+2]=Math.sin(th)*br; }
-    else { const th=Math.random()*TAU,r=0.35*Math.random(); p[i*3]=Math.cos(th)*r; p[i*3+1]=0.5+Math.random()*1.2; p[i*3+2]=Math.sin(th)*r; }
+    const th = Math.random() * TAU;
+    const d = 0.95 + Math.random() * 0.05;
+    if (t < 0.40) {
+      // Glass bulb — full sphere top, A19 bulb profile
+      const phi = Math.acos(Math.random()); // upper hemisphere
+      const r = 3.5 * d;
+      p[i*3]=r*Math.sin(phi)*Math.cos(th); p[i*3+1]=r*Math.cos(phi)+1.0; p[i*3+2]=r*Math.sin(phi)*Math.sin(th);
+    } else if (t < 0.58) {
+      // Bulb lower taper — smooth pear shape transition
+      const h = Math.random(); // 0=equator, 1=neck
+      // Pear profile: starts at full radius, curves inward following real bulb shape
+      const profile = Math.cos(h * Math.PI * 0.5); // cosine taper
+      const r = 3.5 * profile * d;
+      p[i*3]=Math.cos(th)*r; p[i*3+1]=-h*3.0+1.0; p[i*3+2]=Math.sin(th)*r;
+    } else if (t < 0.72) {
+      // Neck — narrow cylinder connecting bulb to base
+      const h = Math.random() * 1.2;
+      const r = (0.9 + Math.sin(h*3)*0.05) * d;
+      p[i*3]=Math.cos(th)*r; p[i*3+1]=-2.0-h; p[i*3+2]=Math.sin(th)*r;
+    } else if (t < 0.88) {
+      // Edison screw base — wider with visible thread ridges
+      const h = Math.random() * 2.5;
+      const baseR = 1.15 - h*0.08;
+      // Screw thread — pronounced sine ridges
+      const thread = Math.sin(h * 16) * 0.15;
+      const r = (baseR + thread) * d;
+      p[i*3]=Math.cos(th)*r; p[i*3+1]=-3.2-h; p[i*3+2]=Math.sin(th)*r;
+    } else if (t < 0.94) {
+      // Base contact — flat disc at bottom
+      const r = Math.random() * 0.7 * d;
+      p[i*3]=Math.cos(th)*r; p[i*3+1]=-5.7; p[i*3+2]=Math.sin(th)*r;
+    } else {
+      // Filament — glowing coil inside the bulb
+      const h = Math.random() * 2.0;
+      const coilR = 0.3 + Math.sin(h*8)*0.15;
+      p[i*3]=Math.cos(th+h*6)*coilR; p[i*3+1]=0.5+h; p[i*3+2]=Math.sin(th+h*6)*coilR;
+    }
   }
   return p;
 }
 
-function isLandish(lat: number, lon: number): boolean {
-  return Math.sin(lat*2.5+0.3)*Math.cos(lon*3.1-0.8)*0.5+Math.sin(lat*5.2-lon*2.3)*0.25+Math.cos(lat*1.2+lon*4.5)*0.15 > -0.1;
+// Simplified continent boundaries — checks if lat/lon (radians) is over land
+function isLand(latR: number, lonR: number): boolean {
+  const lat = latR * 180 / Math.PI; // degrees
+  const lon = lonR * 180 / Math.PI;
+  // North America
+  if (lat>25&&lat<72&&lon>-170&&lon<-50) {
+    if (lat>48&&lon<-55) return true; // Canada
+    if (lat>25&&lat<50&&lon>-130&&lon<-65) return true; // USA
+    if (lat>15&&lat<32&&lon>-120&&lon<-85) return true; // Mexico
+    return false;
+  }
+  // South America
+  if (lat>-58&&lat<15&&lon>-82&&lon<-34) {
+    if (lon>-75&&lon<-35&&lat>-55&&lat<10) return true;
+    return false;
+  }
+  // Europe
+  if (lat>35&&lat<72&&lon>-12&&lon<45) return true;
+  // Africa
+  if (lat>-36&&lat<38&&lon>-18&&lon<52) {
+    if (lat>0&&lon>42) return false; // Arabian sea
+    return true;
+  }
+  // Asia
+  if (lat>10&&lat<75&&lon>45&&lon<180) return true;
+  if (lat>-10&&lat<10&&lon>95&&lon<140) return true; // SE Asia islands
+  // Australia
+  if (lat>-45&&lat<-10&&lon>112&&lon<155) return true;
+  // Greenland
+  if (lat>60&&lat<84&&lon>-55&&lon<-15) return true;
+  // Antarctica
+  if (lat<-65) return true;
+  return false;
 }
 
 function shapeGlobe(N: number): Float32Array {
   const p = new Float32Array(N * 3); let idx = 0;
   while (idx < N) {
-    const phi=Math.acos(2*Math.random()-1),th=Math.random()*TAU;
-    const lat=Math.PI/2-phi,lon=th-Math.PI;
-    const land=isLandish(lat,lon);
-    const r=land?4.2*(0.97+Math.random()*0.03):4.2*(0.90+Math.random()*0.05);
-    if (!land&&Math.random()<0.4) continue;
+    const phi = Math.acos(2*Math.random()-1), th = Math.random()*TAU;
+    const lat = Math.PI/2 - phi;  // -π/2 to π/2
+    const lon = th - Math.PI;     // -π to π
+    const land = isLand(lat, lon);
+    // Land: on surface. Ocean: slightly inward + sparser
+    const r = land ? 4.2*(0.97+Math.random()*0.03) : 4.2*(0.88+Math.random()*0.06);
+    // Skip 55% of ocean particles — creates visible continent outlines
+    if (!land && Math.random() < 0.55) continue;
     p[idx*3]=r*Math.sin(phi)*Math.cos(th); p[idx*3+1]=r*Math.cos(phi); p[idx*3+2]=r*Math.sin(phi)*Math.sin(th);
-    idx++; if (idx>=N) break;
+    idx++; if (idx >= N) break;
   }
   return p;
 }
@@ -334,10 +424,11 @@ export default function HeroParticles() {
       pts.rotation.x+=(tRX-pts.rotation.x)*0.02;
       pts.rotation.y+=0.0003;
 
-      // Brain 120° scroll rotation (longer range now)
-      if(p>=0.28&&p<=0.46) brainRotOff=((p-0.28)/0.18)*(TAU/3);
+      // Brain: exactly ONE full 360° rotation over its scroll range
+      if(p>=0.28&&p<=0.46) brainRotOff=((p-0.28)/0.18)*TAU; // 0 → 2π (one full turn)
       else if(p<0.28) brainRotOff=0;
-      if(shA===2&&!isTr) pts.rotation.y+=brainRotOff;
+      else brainRotOff=TAU; // stay at final angle after brain section
+      if(shA===2&&!isTr) pts.rotation.y=brainRotOff+(sm.x-0.5)*0.3; // SET not ADD — prevents accumulation
 
       bgPts.rotation.y=time*0.02; bgPts.rotation.x=Math.sin(time*0.2)*0.02;
       bgMat.uniforms.uTime.value=time;
@@ -412,6 +503,27 @@ export default function HeroParticles() {
             REQUEST A CONVERSATION
           </a>
         </div>
+
+        {/* Funnel hover leads — floating labels showing leads entering */}
+        {prog > 0.10 && prog < 0.25 && (
+          <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden" aria-hidden="true">
+            {["João Silva — Lead Qualificado", "Maria Santos — Demo Agendada", "Tech Corp — Proposta Enviada",
+              "Growth Ltd — Reunião Marcada", "Ana Costa — Formulário Preenchido", "Pedro Lima — Retargeting Ativo",
+              "StartupXYZ — Interesse Alto", "Carlos Faria — MQL Confirmado"
+            ].map((label, i) => {
+              const x = 25 + Math.sin(i * 1.7 + prog * 20) * 25;
+              const y = 10 + (i * 11 + prog * 300 + i * 50) % 85;
+              const op = 0.15 + Math.sin(i * 2.3 + prog * 15) * 0.15;
+              return (
+                <div key={i} className="absolute text-[10px] sm:text-[11px] font-light text-purple-300/60 whitespace-nowrap"
+                  style={{ left: `${x}%`, top: `${y}%`, opacity: op, transition: "none" }}>
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400/50 mr-2 align-middle" />
+                  {label}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Section texts — alternate left/right like Dala */}
         <div className="absolute inset-0 z-10 flex items-center pointer-events-none">

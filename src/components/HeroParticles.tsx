@@ -130,7 +130,7 @@ const VERT = `
     vD = d;
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
     gl_Position = projectionMatrix * mv;
-    float sz = aSize * uScale * uPR * (120.0 / -mv.z);
+    float sz = aSize * uScale * uPR * (160.0 / -mv.z);
     if (d < uMR) sz *= 1.0 + (1.0-d/uMR)*2.0;
     gl_PointSize = max(1.5, sz);
   }
@@ -207,7 +207,7 @@ export default function HeroParticles() {
 
     const scene = new THREE.Scene();
     const cam = new THREE.PerspectiveCamera(45, 1, 0.1, 200);
-    cam.position.set(mob ? 0 : 2.5, 0, 14);
+    cam.position.set(mob ? 0 : 2, 0, 11);
 
     const ren = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     ren.setClearColor(BG, 1);
@@ -222,8 +222,9 @@ export default function HeroParticles() {
     for (let i = 0; i < N; i++) {
       const c = PAL[Math.floor(Math.random()*PAL.length)];
       col[i*3]=c[0]; col[i*3+1]=c[1]; col[i*3+2]=c[2];
+      // Dala-level sizes: lots of medium + many large visible triangles
       const r = Math.random();
-      siz[i] = r<0.55 ? 0.04+Math.random()*0.10 : r<0.88 ? 0.14+Math.random()*0.30 : 0.38+Math.random()*0.55;
+      siz[i] = r<0.40 ? 0.08+Math.random()*0.18 : r<0.75 ? 0.28+Math.random()*0.55 : 0.70+Math.random()*0.90;
       rot[i] = Math.random()*TAU;
     }
 
@@ -286,17 +287,17 @@ export default function HeroParticles() {
     function onT(e:TouchEvent){const t=e.touches[0];if(!t)return;mouse.x=t.clientX/window.innerWidth;mouse.y=t.clientY/window.innerHeight;const r=canvas.getBoundingClientRect();mNDC.x=((t.clientX-r.left)/r.width)*2-1;mNDC.y=-((t.clientY-r.top)/r.height)*2+1;}
 
     /*
-      SCROLL TIMELINE:
-      0.00-0.08: Hero text only (particles at origin, invisible)
-      0.08-0.16: Particles explode from origin → funnel
-      0.16-0.26: FUNNEL stable + text
-      0.26-0.34: Explode funnel → brain
-      0.34-0.50: BRAIN (2 scrolls, rotates 120°)
-      0.50-0.58: Explode brain → lightbulb
-      0.58-0.68: LIGHTBULB
-      0.68-0.76: Explode lightbulb → globe
-      0.76-0.88: GLOBE
-      0.88-1.00: Fade
+      SCROLL TIMELINE (1000vh = 900vh travel, much slower):
+      0.00-0.06: Hero text only
+      0.06-0.12: Explode origin → funnel
+      0.12-0.22: FUNNEL stable
+      0.22-0.28: Explode funnel → brain
+      0.28-0.46: BRAIN (long hold, 2 texts, rotates 120°)
+      0.46-0.52: Explode brain → lightbulb
+      0.52-0.64: LIGHTBULB stable
+      0.64-0.70: Explode lightbulb → globe
+      0.70-0.86: GLOBE stable
+      0.86-1.00: Fade out
     */
 
     function animate() {
@@ -306,14 +307,14 @@ export default function HeroParticles() {
       const p=pRef.current;
 
       let shA=0,shB=0,lT=0,isTr=false;
-      if (p<0.08)      { shA=0;shB=0;lT=0; }
-      else if (p<0.16) { shA=0;shB=1;lT=ss(0.08,0.16,p);isTr=true; }
-      else if (p<0.26) { shA=1;shB=1;lT=0; }
-      else if (p<0.34) { shA=1;shB=2;lT=ss(0.26,0.34,p);isTr=true; }
-      else if (p<0.50) { shA=2;shB=2;lT=0; }
-      else if (p<0.58) { shA=2;shB=3;lT=ss(0.50,0.58,p);isTr=true; }
-      else if (p<0.68) { shA=3;shB=3;lT=0; }
-      else if (p<0.76) { shA=3;shB=4;lT=ss(0.68,0.76,p);isTr=true; }
+      if (p<0.06)      { shA=0;shB=0;lT=0; }
+      else if (p<0.12) { shA=0;shB=1;lT=ss(0.06,0.12,p);isTr=true; }
+      else if (p<0.22) { shA=1;shB=1;lT=0; }
+      else if (p<0.28) { shA=1;shB=2;lT=ss(0.22,0.28,p);isTr=true; }
+      else if (p<0.46) { shA=2;shB=2;lT=0; }
+      else if (p<0.52) { shA=2;shB=3;lT=ss(0.46,0.52,p);isTr=true; }
+      else if (p<0.64) { shA=3;shB=3;lT=0; }
+      else if (p<0.70) { shA=3;shB=4;lT=ss(0.64,0.70,p);isTr=true; }
       else             { shA=4;shB=4;lT=0; }
 
       const from=shapes[shA],to=shapes[shB];
@@ -333,17 +334,17 @@ export default function HeroParticles() {
       pts.rotation.x+=(tRX-pts.rotation.x)*0.02;
       pts.rotation.y+=0.0003;
 
-      // Brain 120° scroll rotation
-      if(p>=0.34&&p<=0.50) brainRotOff=((p-0.34)/0.16)*(TAU/3);
-      else if(p<0.34) brainRotOff=0;
+      // Brain 120° scroll rotation (longer range now)
+      if(p>=0.28&&p<=0.46) brainRotOff=((p-0.28)/0.18)*(TAU/3);
+      else if(p<0.28) brainRotOff=0;
       if(shA===2&&!isTr) pts.rotation.y+=brainRotOff;
 
       bgPts.rotation.y=time*0.02; bgPts.rotation.x=Math.sin(time*0.2)*0.02;
       bgMat.uniforms.uTime.value=time;
 
-      cam.position.x=(mob?0:2.5)+(sm.x-0.5)*1.2;
-      cam.position.y=(sm.y-0.5)*-0.8;
-      cam.lookAt(mob?0:1,0,0);
+      cam.position.x=(mob?0:2)+(sm.x-0.5)*1.0;
+      cam.position.y=(sm.y-0.5)*-0.6;
+      cam.lookAt(mob?0:0.8,0,0);
 
       // Pin on globe
       if(pinReady&&shA===4&&!isTr){
@@ -351,7 +352,7 @@ export default function HeroParticles() {
         const pulse=1+Math.sin(Date.now()*0.004)*0.2;pinRingMat.opacity=0.3+Math.sin(Date.now()*0.003)*0.2;pinDot.scale.setScalar(pulse);pinRing.scale.setScalar(pulse*1.3);
       } else { pinGroup.visible=false; }
 
-      const fade=p>0.88?1-ss(0.88,1.0,p):1;
+      const fade=p>0.86?1-ss(0.86,1.0,p):1;
       mat.uniforms.uScale.value=fade;
       ren.render(scene,cam);
     }
@@ -367,11 +368,11 @@ export default function HeroParticles() {
 
   // ── Text ranges for vertical slide ──────────────────────────────────────────
   const RANGES: [number,number][] = [
-    [0.16, 0.30], // funnel
-    [0.34, 0.44], // brain 1
-    [0.44, 0.52], // brain 2
-    [0.58, 0.70], // lightbulb
-    [0.76, 0.88], // globe
+    [0.12, 0.25], // funnel
+    [0.28, 0.38], // brain 1
+    [0.38, 0.48], // brain 2
+    [0.52, 0.66], // lightbulb
+    [0.70, 0.86], // globe
   ];
 
   function txStyle(i: number) {
@@ -383,13 +384,13 @@ export default function HeroParticles() {
   }
 
   // Hero heading fades out as particles appear
-  const heroOp = 1 - ss(0.04, 0.14, prog);
-  const heroY = ss(0.02, 0.14, prog) * -80;
-  const exit = ss(0.90, 1.0, prog);
+  const heroOp = 1 - ss(0.03, 0.10, prog);
+  const heroY = ss(0.02, 0.10, prog) * -80;
+  const exit = ss(0.88, 1.0, prog);
 
   return (
     <section ref={sRef} aria-label="HLM — Interactive revenue funnel"
-      className="relative" style={{ height: "700vh", backgroundColor: "#000" }}>
+      className="relative" style={{ height: "1000vh", backgroundColor: "#000" }}>
       <div className="sr-only"><h1>HLM Revenue System</h1></div>
       <div className="sticky top-0 flex w-full items-center overflow-hidden"
         style={{ height: "100svh", minHeight: "100vh" }}>
@@ -398,7 +399,7 @@ export default function HeroParticles() {
         {/* HERO — large centered text, like Dala's first view. Fades as particles appear */}
         <div className="absolute inset-0 z-10 flex flex-col items-start justify-center px-8 sm:px-12 md:px-20 lg:px-28"
           style={{ opacity: heroOp, transform: `translateY(${heroY}px)`, pointerEvents: heroOp < 0.1 ? "none" : "auto" }}>
-          <h1 className="text-[2.8rem] sm:text-[4rem] md:text-[5.5rem] font-[300] leading-[1.02] tracking-tight text-white whitespace-pre-line">
+          <h1 className="text-[2.8rem] sm:text-[4.5rem] md:text-[7rem] lg:text-[7.5rem] font-[400] leading-[1.02] tracking-tight text-white whitespace-pre-line">
             {HERO_TITLE}
           </h1>
           <p className="mt-8 text-[11px] sm:text-[13px] font-semibold tracking-[0.25em] text-purple-400 uppercase">
@@ -412,21 +413,23 @@ export default function HeroParticles() {
           </a>
         </div>
 
-        {/* Section texts — slide in/out as you scroll through shapes */}
+        {/* Section texts — alternate left/right like Dala */}
         <div className="absolute inset-0 z-10 flex items-center pointer-events-none">
-          <div className="relative px-8 sm:px-12 md:px-20 lg:px-28 max-w-2xl">
-            {SECTIONS.map((tx, i) => (
-              <div key={i} className="absolute top-0 left-0 flex flex-col gap-4 w-full"
+          {SECTIONS.map((tx, i) => {
+            // Alternate sides: 0=left, 1=right, 2=right, 3=left, 4=right
+            const isRight = i === 1 || i === 2 || i === 4;
+            return (
+              <div key={i} className={`absolute top-1/2 -translate-y-1/2 flex flex-col gap-4 max-w-lg ${isRight ? "right-8 sm:right-12 md:right-20 lg:right-28 text-right items-end" : "left-8 sm:left-12 md:left-20 lg:left-28 text-left items-start"}`}
                 style={{ ...txStyle(i), transition: "none" }}>
-                <h2 className="text-[2rem] sm:text-[2.8rem] md:text-[3.8rem] font-[300] leading-[1.05] tracking-tight text-white whitespace-pre-line">
+                <h2 className="text-[2rem] sm:text-[2.8rem] md:text-[3.2rem] font-[400] leading-[1.08] tracking-tight text-white whitespace-pre-line">
                   {tx.t}
                 </h2>
                 <p className="text-[14px] sm:text-[16px] font-light leading-[1.7] text-white/50 max-w-md whitespace-pre-line">
                   {tx.s}
                 </p>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
         <div className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2"

@@ -3,7 +3,7 @@ import { Resend } from "resend";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-const TO = "contato@highlevelmkt.com";
+const TO = "vinicius.highlevelmkt@gmail.com";
 
 // ─── Sanitise ─────────────────────────────────────────────────────────────────
 // Escape HTML special characters before injecting user input into the template.
